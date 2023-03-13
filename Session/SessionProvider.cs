@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Session
 {
-    internal class SessionProvider
+    internal class SessionProvider : Common.Interface.IServiceProvider
     {
+        private void Initialize()
+        {
+
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Common
+﻿namespace Common.Network
 {
     public class SocketFramework
     {

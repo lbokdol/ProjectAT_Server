@@ -1,0 +1,13 @@
+﻿using Common.Interface;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Monitoring.Service
+{
+    internal class MonitoringManager : IServiceManager
+    {
+    }
+}
