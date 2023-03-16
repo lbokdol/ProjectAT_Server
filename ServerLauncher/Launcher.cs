@@ -8,5 +8,21 @@ namespace ServerLauncher
 {
     internal class Launcher
     {
+        public Launcher()
+        {
+
+        }
+
+        private void Initialize()
+        {
+
+        }
+
+        private void SetConfiguration()
+        {
+
+        }
+
+        
     }
 }

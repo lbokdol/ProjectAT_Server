@@ -1,6 +1,6 @@
 ﻿namespace Session.Service
 {
-    public class Class1
+    public class SessionService
     {
 
     }
