@@ -1,12 +1,20 @@
 ﻿using System;
-using System.Reflection;
+using Microsoft.Extensions.Hosting;
 
-Assembly a = Assembly.Load("Session");
+namespace ServerLauncher
+{
+    class Program
+    {
+        public static void Main(string[] args)
+        {
+            var launcher = new Launcher();
 
-Type myType = a.GetType("Session.Program");
+            while (true)
+            {
 
-MethodInfo myMethod = myType.GetMethod("Main");
+            }
+        }
 
-object obj = Activator.CreateInstance(myType);
+    }
+}
 
-myMethod.Invoke(obj, new string[1]);

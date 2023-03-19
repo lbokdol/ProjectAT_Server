@@ -7,6 +7,14 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+   <ItemGroup>
+    <Protobuf Include="Protos\greet.proto" GrpcServices="Server" />
+   </ItemGroup>
+	
+  <ItemGroup>
+    <PackageReference Include="Grpc.AspNetCore" Version="2.52.0" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Session\Session.csproj" />
   </ItemGroup>

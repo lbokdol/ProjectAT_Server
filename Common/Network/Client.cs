@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Common.Network
 {
-    internal class Client
+    public class Client
     {
     }
 }

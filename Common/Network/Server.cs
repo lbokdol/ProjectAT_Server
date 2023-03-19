@@ -1,46 +1,57 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using System.Text;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Text.Json;
+using Common.Object;
 
 namespace Common.Network
 {
-    internal class Server
+    public class Server
     {
-        SocketAsyncEventArgs _acceptArgs;
-        Socket _listenSocket;
-
-        public delegate void SocketAsyncEventHandler(object sender, SocketAsyncEventArgs e);
-        public SocketAsyncEventHandler callbackNewclient;
-
         public Server()
         {
 
         }
 
-        public void Start(string host, int port)
+        public async Task Start()
         {
-            _listenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            Socket listener = new Socket(SocketType.Stream, ProtocolType.Tcp);
+            listener.Bind(new IPEndPoint(IPAddress.Any, 11000));
+            listener.Listen(100);
 
-            IPAddress address;
-            if (host == "0.0.0.0")
-                address = IPAddress.Any;
-            else
-                address = IPAddress.Parse(host);
-
-            IPEndPoint endPoint = new IPEndPoint(address, port);
-
-            try
+            while (true)
             {
-                _listenSocket.Bind(endPoint);
-                _listenSocket.Listen(1);
+                Socket client = await listener.AcceptAsync();
+                Console.WriteLine($"Client connected: {client.RemoteEndPoint}");
 
-                _acceptArgs = new SocketAsyncEventArgs();
+                Task.Factory.StartNew(async () =>
+                {
+                    try
+                    {
+                        byte[] buffer = new byte[1024];
+                        var bytesReceived = client.Receive(buffer);
 
-                _listenSocket.AcceptAsync(_acceptArgs);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
+                        Packet packet;
+                        using (MemoryStream stream = new MemoryStream(buffer, 0, bytesReceived))
+                        {
+                            packet = JsonSerializer.Deserialize<Packet>(stream);
+                        }
+
+                        /*
+                        byte[] message = Encoding.ASCII.GetBytes("Hello Client~");
+                        int bytesSent = client.Send(message);
+
+                        Console.WriteLine($"Data sent: {Encoding.ASCII.GetString(message)}");
+                        */
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Exception: {ex.Message}");
+                    }
+                });
             }
         }
     }
