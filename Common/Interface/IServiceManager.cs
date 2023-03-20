@@ -2,9 +2,9 @@
 {
     public interface IServiceManager
     {
-        void Initialize() { }
-        void Shutdown() { }
-        void Connect() { }
-        void Disconnect() { }
+        void Initialize();
+        void Shutdown();
+        void ConnectChannel();
+        void DisconnectChannel();
     }
 }
