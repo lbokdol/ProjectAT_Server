@@ -13,12 +13,13 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="MessagePack" Version="2.5.108" />
 	<PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
-	<Protobuf Include="Protos\greet.proto" GrpcServices="Client" />
+	<Protobuf Include="Protos\account.proto" GrpcServices="Client" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Protos\greet.proto">
+    <None Update="Protos\account.proto">
       <GrpcServices>Server</GrpcServices>
     </None>
   </ItemGroup>

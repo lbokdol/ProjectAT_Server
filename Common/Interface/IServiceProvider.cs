@@ -8,6 +8,15 @@ namespace Common.Interface
 {
     public interface IServiceProvider
     {
-        void Initialize() { }
+        Task RunAsync(CancellationToken cancellationToken);
+        ServiceStatus Status { get; }
+    }
+
+    public enum ServiceStatus
+    {
+        Stopped,
+        Running,
+        Stopping,
+        Error
     }
 }

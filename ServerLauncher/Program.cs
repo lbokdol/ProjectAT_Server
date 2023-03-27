@@ -1,20 +1,20 @@
 ﻿using System;
-using Microsoft.Extensions.Hosting;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace ServerLauncher
 {
     class Program
     {
-        public static void Main(string[] args)
+        static void Main(string[] args)
         {
             var launcher = new Launcher();
-
             while (true)
             {
 
             }
         }
-
     }
 }
-

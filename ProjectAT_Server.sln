@@ -17,7 +17,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Account", "Account\Account.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameWorld", "GameWorld\GameWorld.csproj", "{2756B430-381B-4B1A-B253-7CD1ACAFF3A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitoring", "Monitoring\Monitoring.csproj", "{D16BEA56-08FB-4006-97E4-724157AE54F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Monitoring", "Monitoring\Monitoring.csproj", "{D16BEA56-08FB-4006-97E4-724157AE54F3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authentication", "Authentication\Authentication.csproj", "{B0B063A1-0616-4FAF-982B-E703FE89F297}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chat", "Chat\Chat.csproj", "{D67D6DF3-B96E-452C-A487-CDC7661F85E0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventory", "Inventory\Inventory.csproj", "{6F56F761-FEBA-4EF1-AACA-0DD400E83089}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Player", "Player\Player.csproj", "{9463A105-3E00-4975-88F0-20C7074721A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Redis", "Redis\Redis.csproj", "{1594A60A-7C0C-4A1A-88F9-5FB0196DF0EC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +67,26 @@ Global
 		{D16BEA56-08FB-4006-97E4-724157AE54F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D16BEA56-08FB-4006-97E4-724157AE54F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D16BEA56-08FB-4006-97E4-724157AE54F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0B063A1-0616-4FAF-982B-E703FE89F297}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0B063A1-0616-4FAF-982B-E703FE89F297}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0B063A1-0616-4FAF-982B-E703FE89F297}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0B063A1-0616-4FAF-982B-E703FE89F297}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D67D6DF3-B96E-452C-A487-CDC7661F85E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D67D6DF3-B96E-452C-A487-CDC7661F85E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D67D6DF3-B96E-452C-A487-CDC7661F85E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D67D6DF3-B96E-452C-A487-CDC7661F85E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F56F761-FEBA-4EF1-AACA-0DD400E83089}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F56F761-FEBA-4EF1-AACA-0DD400E83089}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F56F761-FEBA-4EF1-AACA-0DD400E83089}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F56F761-FEBA-4EF1-AACA-0DD400E83089}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9463A105-3E00-4975-88F0-20C7074721A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9463A105-3E00-4975-88F0-20C7074721A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9463A105-3E00-4975-88F0-20C7074721A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9463A105-3E00-4975-88F0-20C7074721A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1594A60A-7C0C-4A1A-88F9-5FB0196DF0EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1594A60A-7C0C-4A1A-88F9-5FB0196DF0EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1594A60A-7C0C-4A1A-88F9-5FB0196DF0EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1594A60A-7C0C-4A1A-88F9-5FB0196DF0EC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
