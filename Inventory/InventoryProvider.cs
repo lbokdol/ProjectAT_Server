@@ -1,15 +1,15 @@
 ﻿using Common;
 using Common.Interface;
 
-namespace DB
+namespace Inventory
 {
-    public class DBProvider : Common.Interface.IServiceProvider
+    public class InventoryProvider : Common.Interface.IServiceProvider
     {
         private ServiceStatus _status = ServiceStatus.Stopped;
 
         public async Task RunAsync(CancellationToken cancellationToken)
         {
-            LoggingService.Logger.Information("DB Service is Starting...");
+            LoggingService.Logger.Information("Inventory Service is Starting...");
 
             try
             {
@@ -20,12 +20,12 @@ namespace DB
             }
             catch (Exception ex)
             {
-                LoggingService.Logger.Error(ex, "DB Service is encountered...");
+                LoggingService.Logger.Error(ex, "Inventory Service is encountered...");
                 _status = ServiceStatus.Error;
             }
             finally
             {
-                LoggingService.Logger.Information("DB is stopping...");
+                LoggingService.Logger.Information("Inventory is stopping...");
                 _status = ServiceStatus.Stopping;
             }
         }

@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ServerLauncher.Config
+namespace Common.Packet
 {
-    internal class Configuration
+    public class PacketHandler
     {
+
     }
 }

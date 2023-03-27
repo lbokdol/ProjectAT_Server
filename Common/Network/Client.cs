@@ -8,5 +8,6 @@ namespace Common.Network
 {
     public class Client
     {
+
     }
 }

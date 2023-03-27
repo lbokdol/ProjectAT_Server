@@ -1,15 +1,15 @@
 ﻿using Common;
 using Common.Interface;
 
-namespace DB
+namespace Chat
 {
-    public class DBProvider : Common.Interface.IServiceProvider
+    public class ChatProvider : Common.Interface.IServiceProvider
     {
         private ServiceStatus _status = ServiceStatus.Stopped;
 
         public async Task RunAsync(CancellationToken cancellationToken)
         {
-            LoggingService.Logger.Information("DB Service is Starting...");
+            LoggingService.Logger.Information("Chat Service is Starting...");
 
             try
             {
@@ -20,12 +20,12 @@ namespace DB
             }
             catch (Exception ex)
             {
-                LoggingService.Logger.Error(ex, "DB Service is encountered...");
+                LoggingService.Logger.Error(ex, "Chat Service is encountered...");
                 _status = ServiceStatus.Error;
             }
             finally
             {
-                LoggingService.Logger.Information("DB is stopping...");
+                LoggingService.Logger.Information("Chat is stopping...");
                 _status = ServiceStatus.Stopping;
             }
         }

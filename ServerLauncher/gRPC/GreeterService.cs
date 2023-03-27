@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Grpc.Core;
 using GrpcServerLauncher;
 
-namespace ServerLauncher.Services
+namespace ServerLauncher.gRPC
 {
     public class GreeterService : Greeter.GreeterBase
     {
