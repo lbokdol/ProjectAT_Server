@@ -13,7 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
 using Common;
-using Account;
+using AccountSpace;
 using Authentication;
 using Chat;
 using Inventory;
@@ -83,7 +83,7 @@ namespace ServerLauncher
                 if (service != null)
                 {
                     Console.WriteLine($"Starting {serviceName}...");
-                    serviceTasks.Add(service.RunAsync(_serviceCancellationToken.Token));
+                    serviceTasks.Add(service.RunAsync(serviceName.Value.IPAddress, serviceName.Value.Port, _serviceCancellationToken.Token));
                 }
                 else
                 {
@@ -120,7 +120,7 @@ namespace ServerLauncher
                 case "PlayerService":
                     return new PlayerProvider();
                 case "SessionService":
-                    return new SessionProvider(port, maxConnections);
+                    return new SessionProvider(maxConnections);
                 case "GameWorldService":
                     return new WorldProvider();
                 case "DBService":
@@ -168,7 +168,7 @@ namespace ServerLauncher
             serviceCancellationToken = new CancellationTokenSource();
 
             // 서비스 재시작
-            await service.RunAsync(serviceCancellationToken.Token);
+            await service.RunAsync(service.GetAddress(), service.GetPort(), serviceCancellationToken.Token);
         }
 
         private async Task StopAllService()

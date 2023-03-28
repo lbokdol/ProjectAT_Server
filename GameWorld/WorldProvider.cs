@@ -1,15 +1,21 @@
 ﻿using Common;
 using Common.Interface;
+using System.Net;
+using System.Runtime.CompilerServices;
 
 namespace GameWorld
 {
     public class WorldProvider : Common.Interface.IServiceProvider
     {
         private ServiceStatus _status = ServiceStatus.Stopped;
+        private string _address;
+        private int _port;
 
-        public async Task RunAsync(CancellationToken cancellationToken)
+        public async Task RunAsync(string address, int port, CancellationToken cancellationToken)
         {
             LoggingService.Logger.Information("World Service is Starting...");
+
+            Initialize(address, port);
 
             try
             {
@@ -30,5 +36,21 @@ namespace GameWorld
             }
         }
         public ServiceStatus Status => _status;
+
+        private void Initialize(string address, int port)
+        {
+            _address = address;
+            _port = port;
+        }
+
+        public string GetAddress()
+        {
+            return _address;
+        }
+
+        public int GetPort()
+        {
+            return _port;
+        }
     }
 }

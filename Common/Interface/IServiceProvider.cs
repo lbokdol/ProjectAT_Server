@@ -8,8 +8,10 @@ namespace Common.Interface
 {
     public interface IServiceProvider
     {
-        Task RunAsync(CancellationToken cancellationToken);
+        Task RunAsync(string address, int port, CancellationToken cancellationToken);
         ServiceStatus Status { get; }
+        string GetAddress();
+        int GetPort();
     }
 
     public enum ServiceStatus
