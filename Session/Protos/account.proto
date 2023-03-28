@@ -1,19 +1,22 @@
 ﻿syntax = "proto3";
 
-option csharp_namespace = "Session";
+option csharp_namespace = "AccountService";
 
-service SessionService {
-  rpc Login (LoginReq) returns (LoginRes);
+package account;
+
+// Account 서비스 정의
+service Account {
+  rpc Login (LoginRequest) returns (LoginResponse);
 }
 
 // 로그인 요청 메시지 정의
-message LoginReq {
+message LoginRequest {
   string username = 1;
   string password = 2;
 }
 
 // 로그인 응답 메시지 정의
-message LoginRes {
+message LoginResponse {
   string user_id = 1;
   int32 status_code = 2;
   string message = 3;

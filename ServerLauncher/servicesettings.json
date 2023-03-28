@@ -37,7 +37,7 @@
         "IPAddress": "127.0.0.1",
         "Port": 6809
       },
-      "MonitoringService": {
+      "Monitoring": {
         "IPAddress": "127.0.0.1",
         "Port": 6810
       }

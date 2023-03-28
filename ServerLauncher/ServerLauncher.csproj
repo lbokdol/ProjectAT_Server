@@ -8,7 +8,7 @@
   </PropertyGroup>
 
    <ItemGroup>
-    <Protobuf Include="Protos\Launcher.proto" />
+    <Protobuf Include="Protos\Launcher.proto"/>
    </ItemGroup>
 	
   <ItemGroup>
@@ -37,12 +37,6 @@
     <ProjectReference Include="..\Player\Player.csproj" />
     <ProjectReference Include="..\Redis\Redis.csproj" />
     <ProjectReference Include="..\Session\Session.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="servicesettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>
