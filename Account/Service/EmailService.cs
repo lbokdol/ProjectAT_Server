@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using MailKit.Net.Smtp;
 using MimeKit;
 
-namespace Account.Service
+namespace AccountSpace.Service
 {
     public class EmailService
     {

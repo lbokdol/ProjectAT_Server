@@ -5,10 +5,12 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 using Common.Objects;
+using Common.Packet;
+using Grpc.Core;
 
-namespace Account.Service
+namespace AccountSpace.Service
 {
-    public class AccountService
+    public class AccountService : AccountServerService.AccountServerServiceBase
     {
         private EmailService _emailService;
         private Dictionary<Guid, string> _emailVerificationCodes = new Dictionary<Guid, string>();
@@ -16,16 +18,20 @@ namespace Account.Service
         private Dictionary<string, User> _usersByEmail = new Dictionary<string, User>();
         private Dictionary<string, User> _usersByUsername = new Dictionary<string, User>();
 
-        public AccountService(EmailService emailService)
+        private AccountChannel _channel;
+
+        public AccountService(string address, int port)
         {
-            _emailService = emailService;
+            gRPCServerStart(address, port);
+            _channel = new AccountChannel();
+            // _emailService = emailService;
         }
 
         public bool Register(string username, string email, string password)
         {
             if (!ValidateUsername(username) || !ValidateEmail(email) || !ValidatePassword(password))
             {
-                return false; // 유효하지 않은 입력 값
+                return false;
             }
 
             SendEmailVerification(email);
@@ -43,6 +49,40 @@ namespace Account.Service
             return true;
         }
 
+        public override Task<LoginRes> Login(LoginReq request, ServerCallContext context)
+        {
+            return Task.FromResult(new LoginRes
+            {
+                UserId = request.Username,
+                Message = "Success",
+                StatusCode = 200
+            });
+        }
+
+        public override Task<ConnectRes> Connect(ConnectReq request, ServerCallContext context)
+        {
+            return Task.FromResult(new ConnectRes
+            {
+                Message = "Connect!"
+            });
+        }
+
+        private void gRPCServerStart(string address, int port)
+        {
+            Server server = new Server
+            {
+                Services = { AccountServerService.BindService(this) },
+                Ports = { new ServerPort(address, port, ServerCredentials.Insecure) }
+            };
+
+            server.Start();
+        }
+
+        private void ConnectChannel(string serviceName, string address, int port)
+        {
+            _channel.AddChannel(serviceName, address, port);
+        }
+        /*
         public bool Login(string emailOrUsername, string password)
         {
             User user = null;
@@ -62,6 +102,7 @@ namespace Account.Service
 
             return VerifyPassword(user.PasswordHash, password);
         }
+        */
 
         public bool ResetPassword(string email, string newPassword)
         {

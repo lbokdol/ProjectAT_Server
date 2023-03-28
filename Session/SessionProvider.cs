@@ -18,22 +18,25 @@ namespace Session
     public class SessionProvider : Common.Interface.IServiceProvider
     {
         private ServiceStatus _status = ServiceStatus.Stopped;
-        private readonly int _port;
         private readonly int _maxConnections;
         private readonly SemaphoreSlim _connectionSemaphore;
         private readonly SymmetricAlgorithm _encryptionAlgorithm = Aes.Create();
-        private readonly string _secretKey = "dydrnWja";
+        private readonly string _secretKey = "tlzmfltzl";
         private Client.AccountServiceClient _accountClient;
-        public SessionProvider(int port, int maxConnections)
+
+        private string _address;
+        private int _port;
+
+        public SessionProvider(int maxConnections)
         {
-            _port = port;
             _maxConnections = maxConnections;
             _connectionSemaphore = new SemaphoreSlim(maxConnections, maxConnections);
 
+            // 주소와 포트 받아와야함 고민할 것
             _accountClient = new Client.AccountServiceClient("https://localhost:6801");
         }
 
-        public async Task RunAsync(CancellationToken cancellationToken)
+        public async Task RunAsync(string address, int port, CancellationToken cancellationToken)
         {
             try
             {
@@ -41,7 +44,9 @@ namespace Session
                 _encryptionAlgorithm.IV = Encoding.UTF8.GetBytes("abc-htd-hjb-lgfh");
                 _encryptionAlgorithm.Padding = PaddingMode.PKCS7;
 
-                var listener = new TcpListener(IPAddress.Any, _port);
+                Initialize(address, port);
+
+                var listener = new TcpListener(IPAddress.Parse(address), port);
                 listener.Start();
 
                 LoggingService.Logger.Information("Session Service is Starting...");
@@ -204,7 +209,7 @@ namespace Session
             return decryptor.TransformFinalBlock(data, 0, data.Length);
         }
 
-        private async Task<AccountService.LoginResponse> AuthenticateUserAsync(string username, string password)
+        private async Task<LoginRes> AuthenticateUserAsync(string username, string password)
         {
             var response = await _accountClient.LoginAsync(username, password);
             return response;
@@ -213,6 +218,22 @@ namespace Session
         private Task<bool> ProcessPlayerMoveAsync(Guid userId, double position)
         {
             return Task<bool>.FromResult(true);
+        }
+
+        private void Initialize(string address, int port)
+        {
+            _address = address;
+            _port = port;
+        }
+
+        public string GetAddress()
+        {
+            return _address;
+        }
+
+        public int GetPort()
+        {
+            return _port;
         }
     }
 }

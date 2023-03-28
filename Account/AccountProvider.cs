@@ -1,18 +1,23 @@
 ﻿using Common;
 using Common.Interface;
-using Account.Service;
+using AccountSpace.Service;
 
-namespace Account
+namespace AccountSpace
 {
     public class AccountProvider : Common.Interface.IServiceProvider
     {
         private ServiceStatus _status = ServiceStatus.Stopped;
+        private AccountService _service;
+        private string _address;
+        private int _port;
 
-        public async Task RunAsync(CancellationToken cancellationToken)
+        public async Task RunAsync(string address, int port, CancellationToken cancellationToken)
         {
             LoggingService.Logger.Information("Account Service is Starting...");
 
             _status = ServiceStatus.Running;
+
+            Initialize(address, port);
 
             try
             {
@@ -33,5 +38,28 @@ namespace Account
             }
         }
         public ServiceStatus Status => _status;
+
+        private void Initialize(string address, int port)
+        {
+            _address = address;
+            _port = port;
+
+            CreateService(address, port);
+        }
+
+        private void CreateService(string address, int port)
+        {
+            _service = new AccountService(address, port);
+        }
+
+        public string GetAddress()
+        {
+            return _address;
+        }
+
+        public int GetPort()
+        {
+            return _port;
+        }
     }
 }
