@@ -6,22 +6,23 @@ namespace Monitoring
 {
     public class MonitoringProvider : Common.Interface.IServiceProvider
     {
+        private readonly TaskCompletionSource<bool> _taskCompletionSource = new TaskCompletionSource<bool>();
+
         private ServiceStatus _status = ServiceStatus.Stopped;
         private string _address;
         private int _port;
 
         public async Task RunAsync(string address, int port, CancellationToken cancellationToken)
         {
-            LoggingService.Logger.Information("Monitoring Service is Starting...");
+            cancellationToken.Register(() => _taskCompletionSource.TrySetCanceled());
 
             Initialize(address, port);
 
             try
             {
-                while (!cancellationToken.IsCancellationRequested)
-                {
-                    await Task.Delay(1000, cancellationToken);
-                }
+                LoggingService.Logger.Information("Monitoring Service is Starting...");
+
+                await _taskCompletionSource.Task;
             }
             catch (Exception ex)
             {

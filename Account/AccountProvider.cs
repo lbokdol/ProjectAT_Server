@@ -6,6 +6,8 @@ namespace AccountSpace
 {
     public class AccountProvider : Common.Interface.IServiceProvider
     {
+        private readonly TaskCompletionSource<bool> _taskCompletionSource = new TaskCompletionSource<bool>();
+
         private ServiceStatus _status = ServiceStatus.Stopped;
         private AccountService _service;
         private string _address;
@@ -13,7 +15,7 @@ namespace AccountSpace
 
         public async Task RunAsync(string address, int port, CancellationToken cancellationToken)
         {
-            LoggingService.Logger.Information("Account Service is Starting...");
+            cancellationToken.Register(() => _taskCompletionSource.TrySetCanceled());
 
             _status = ServiceStatus.Running;
 
@@ -21,10 +23,8 @@ namespace AccountSpace
 
             try
             {
-                while (!cancellationToken.IsCancellationRequested)
-                {
-                    await Task.Delay(1000, cancellationToken);
-                }
+                LoggingService.Logger.Information("Account Service is Starting...");
+                await _taskCompletionSource.Task;
             }
             catch (Exception ex)
             {
