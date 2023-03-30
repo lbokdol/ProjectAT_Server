@@ -15,7 +15,6 @@ namespace Chat
         public async Task RunAsync(string address, int port, CancellationToken cancellationToken)
         {
             cancellationToken.Register(() => _taskCompletionSource.TrySetCanceled());
-            
 
             Initialize(address, port);
 

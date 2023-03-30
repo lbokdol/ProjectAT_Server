@@ -13,7 +13,7 @@ namespace ServerLauncher
             var launcher = new Launcher();
             while (true)
             {
-
+                Thread.Sleep(1000);
             }
         }
     }

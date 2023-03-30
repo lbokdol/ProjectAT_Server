@@ -15,22 +15,10 @@
 	</PackageReference>
 	<PackageReference Include="MailKit" Version="3.6.0" />
 	<PackageReference Include="MimeKit" Version="3.6.1" />
-		<Protobuf Include="Protos\GreetServer.proto" GrpcServices="Server" />
-		<Protobuf Include="Protos\GreetClient.proto" GrpcServices="Client" />
+		<Protobuf Include="Protos\GreetServer.proto" GrpcServices="Both" />
 	</ItemGroup>
 
 	<ItemGroup>
 	<ProjectReference Include="..\Common\Common.csproj" />
 	</ItemGroup>
-
-	<ItemGroup>
-		<None Update="Protos\GreetServer.proto">
-			<GrpcServices>Server</GrpcServices>
-		</None>
-		
-		<None Update="Protos\GreetClient.proto">
-			<GrpcServices>Client</GrpcServices>
-		</None>
-	</ItemGroup>
-
 </Project>

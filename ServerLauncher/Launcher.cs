@@ -82,7 +82,7 @@ namespace ServerLauncher
                 Common.Interface.IServiceProvider service = GetServiceByName(serviceName.Key, serviceName.Value.Port, 10000);
                 if (service != null)
                 {
-                    Console.WriteLine($"Starting {serviceName}...");
+                    Console.WriteLine($"Starting {serviceName}... {serviceName.Value.IPAddress} - {serviceName.Value.Port}");
                     serviceTasks.Add(service.RunAsync(serviceName.Value.IPAddress, serviceName.Value.Port, _serviceCancellationToken.Token));
                 }
                 else

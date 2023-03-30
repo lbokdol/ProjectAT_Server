@@ -10,6 +10,7 @@ using Common;
 using Common.Interface;
 using Common.Network;
 using Common.Packet;
+using AccountSpace;
 
 using MessagePack;
 
@@ -33,7 +34,7 @@ namespace Session
             _connectionSemaphore = new SemaphoreSlim(maxConnections, maxConnections);
 
             // 주소와 포트 받아와야함 고민할 것
-            _accountClient = new Client.AccountServiceClient("https://localhost:6801");
+            _accountClient = new Client.AccountServiceClient("localhost:6801");
         }
 
         public async Task RunAsync(string address, int port, CancellationToken cancellationToken)
@@ -119,12 +120,14 @@ namespace Session
         private async Task SendPacketAsync(NetworkStream networkStream, Packet packet, SymmetricAlgorithm encryptionAlgorithm)
         {
             byte[] packetData = MessagePackSerializer.Serialize(packet);
+
             byte[] encryptedPacketData = Encrypt(packetData, encryptionAlgorithm);
 
             byte[] lengthBuffer = BitConverter.GetBytes(encryptedPacketData.Length);
             await networkStream.WriteAsync(lengthBuffer, 0, sizeof(int));
 
             await networkStream.WriteAsync(encryptedPacketData, 0, encryptedPacketData.Length);
+            
         }
 
         private async Task<Packet> ProcessPacketAsync(Packet packet)
@@ -136,8 +139,8 @@ namespace Session
                 case PacketType.LoginRequest:
                     var loginData = MessagePackSerializer.Deserialize<LoginRequest>(packet.Data);
 
-                    var loginResult = await AuthenticateUserAsync(loginData.Username, loginData.Password);
-                    var loginResponse = loginResult;
+                    var loginResult = await AuthenticateUserAsync(new LoginReq() { Username = loginData.Username, Password = loginData.Password });
+                    var loginResponse = new LoginResponse { UserName = loginResult.Username, StatusCode = loginResult.StatusCode, Message = loginResult.Message };
                     byte[] loginResponseData = MessagePackSerializer.Serialize(loginResponse);
 
                     response = new Packet
@@ -146,6 +149,7 @@ namespace Session
                         UserId = packet.UserId,
                         Data = loginResponseData
                     };
+
                     response.Signature = GeneratePacketSignature(response);
                     break;
                 case PacketType.MoveRequest:
@@ -166,8 +170,8 @@ namespace Session
                 default:
                     throw new InvalidOperationException($"Unknown packet type '{packet.Type}'");
             }
-
-            return await Task.FromResult(response);
+            
+            return response;
         }
 
         private bool VerifyPacketSignature(Packet packet)
@@ -209,9 +213,9 @@ namespace Session
             return decryptor.TransformFinalBlock(data, 0, data.Length);
         }
 
-        private async Task<LoginRes> AuthenticateUserAsync(string username, string password)
+        private async Task<LoginRes> AuthenticateUserAsync(LoginReq request)
         {
-            var response = await _accountClient.LoginAsync(username, password);
+            var response = await _accountClient.LoginAsync(request);
             return response;
         }
 

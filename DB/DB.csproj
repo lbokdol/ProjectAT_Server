@@ -11,17 +11,10 @@
     <PackageReference Include="Grpc.AspNetCore" Version="2.52.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.4" />
+	<Protobuf Include="Protos\greet.proto" GrpcServices="Both" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Protos\greet.proto">
-      <GrpcServices>Client</GrpcServices>
-    </None>
-	  <Protobuf Include="Protos\greet.proto" GrpcServices="Client" />
-  </ItemGroup>
-
 </Project>

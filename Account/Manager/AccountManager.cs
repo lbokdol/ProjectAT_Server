@@ -75,7 +75,7 @@ namespace Account.Manager
         {
             foreach(var item in _account.GetConsumingEnumerable())
             {
-                //db에 upsert 요청
+                //db에 upsert 요청 PS로 구현해야함
                 switch(item.Item1)
                 {
                     case DBWorkType.Insert:

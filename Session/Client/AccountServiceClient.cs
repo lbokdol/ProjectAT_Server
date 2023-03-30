@@ -3,25 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Grpc.Net.Client;
 using Common.Objects;
+using Grpc.Core;
+using AccountSpace;
 
 namespace Session.Client
 {
     public class AccountServiceClient
     {
-        private readonly SessionService.SessionServiceClient _client;
+        private readonly AccountServerService.AccountServerServiceClient _client;
 
         public AccountServiceClient(string accountServiceUrl)
         {
-            var channel = GrpcChannel.ForAddress(accountServiceUrl);
-            _client = new SessionService.SessionServiceClient(channel);
+            var channel = new Channel(accountServiceUrl, ChannelCredentials.Insecure);
+            _client = new AccountServerService.AccountServerServiceClient(channel);
         }
 
-        public async Task<LoginRes> LoginAsync(string username, string password)
+        public async Task<LoginRes> LoginAsync(LoginReq request)
         {
-            var request = new LoginReq { Username = username, Password = password };
-            return _client.Login(request);
+            return await _client.LoginAsync(request);
         }
     }
 }

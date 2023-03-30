@@ -6,24 +6,29 @@ using System.Text.RegularExpressions;
 
 using Common.Objects;
 using Common.Packet;
+using Discord;
 using Grpc.Core;
+using Org.BouncyCastle.Asn1.Ocsp;
+using AccountSpace;
 
 namespace AccountSpace.Service
 {
     public class AccountService : AccountServerService.AccountServerServiceBase
     {
-        private EmailService _emailService;
+        //private EmailService _emailService;
         private Dictionary<Guid, string> _emailVerificationCodes = new Dictionary<Guid, string>();
 
         private Dictionary<string, Common.Objects.Account> _usersByEmail = new Dictionary<string, Common.Objects.Account>();
         private Dictionary<string, Common.Objects.Account> _usersByUsername = new Dictionary<string, Common.Objects.Account>();
 
         private AccountChannel _channel;
+        private Server _server;
 
         public AccountService(string address, int port)
         {
-            gRPCServerStart(address, port);
+            _server = gRPCServerStart(address, port);
             _channel = new AccountChannel();
+            _server.Start();
             // _emailService = emailService;
         }
 
@@ -53,12 +58,12 @@ namespace AccountSpace.Service
         {
             return Task.FromResult(new LoginRes
             {
-                UserId = request.Username,
+                Username = request.Username,
                 Message = "Success",
-                StatusCode = 200
+                StatusCode = 200,
             });
         }
-
+        
         public override Task<ConnectRes> Connect(ConnectReq request, ServerCallContext context)
         {
             return Task.FromResult(new ConnectRes
@@ -67,42 +72,20 @@ namespace AccountSpace.Service
             });
         }
 
-        private void gRPCServerStart(string address, int port)
+        private Server gRPCServerStart(string address, int port)
         {
             Server server = new Server
             {
                 Services = { AccountServerService.BindService(this) },
                 Ports = { new ServerPort(address, port, ServerCredentials.Insecure) }
             };
-
-            server.Start();
+            return server;
         }
 
         private void ConnectChannel(string serviceName, string address, int port)
         {
             _channel.AddChannel(serviceName, address, port);
         }
-        /*
-        public bool Login(string emailOrUsername, string password)
-        {
-            User user = null;
-            if (_usersByEmail.ContainsKey(emailOrUsername))
-            {
-                user = _usersByEmail[emailOrUsername];
-            }
-            else if (_usersByUsername.ContainsKey(emailOrUsername))
-            {
-                user = _usersByUsername[emailOrUsername];
-            }
-
-            if (user == null)
-            {
-                return false; // User not found
-            }
-
-            return VerifyPassword(user.PasswordHash, password);
-        }
-        */
 
         public bool ResetPassword(string email, string newPassword)
         {
@@ -171,7 +154,7 @@ namespace AccountSpace.Service
             string subject = "RPG Game - Email Verification";
             string body = $"Hello {user.Username},\n\nPlease use the following verification code to complete your registration:\n\n{verificationCode}\n\nThank you,\nThe RPG Game Team";
 
-            _emailService.SendEmail(email, user.Username, subject, body);
+            //_emailService.SendEmail(email, user.Username, subject, body);
         }
 
         public bool VerifyEmail(Guid userId, string verificationCode)

@@ -51,7 +51,11 @@ namespace Common.Packet
     public class LoginResponse
     {
         [Key(0)]
-        public bool Result { get; set; }
+        public int StatusCode { get; set; }
+        [Key(1)]
+        public string UserName { get; set; }
+        [Key(2)]
+        public string Message { get; set; }
     }
 
     [MessagePackObject]
