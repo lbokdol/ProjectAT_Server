@@ -15,8 +15,8 @@ namespace AccountSpace.Service
         private EmailService _emailService;
         private Dictionary<Guid, string> _emailVerificationCodes = new Dictionary<Guid, string>();
 
-        private Dictionary<string, User> _usersByEmail = new Dictionary<string, User>();
-        private Dictionary<string, User> _usersByUsername = new Dictionary<string, User>();
+        private Dictionary<string, Common.Objects.Account> _usersByEmail = new Dictionary<string, Common.Objects.Account>();
+        private Dictionary<string, Common.Objects.Account> _usersByUsername = new Dictionary<string, Common.Objects.Account>();
 
         private AccountChannel _channel;
 
@@ -36,7 +36,7 @@ namespace AccountSpace.Service
 
             SendEmailVerification(email);
 
-            var user = new User
+            var user = new Common.Objects.Account
             {
                 Id = Guid.NewGuid(),
                 Username = username,
