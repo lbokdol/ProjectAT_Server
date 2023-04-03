@@ -13,8 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
 using Common;
-using AccountSpace;
-using Authentication;
+using Account;
 using Chat;
 using Inventory;
 using Player;
@@ -111,8 +110,6 @@ namespace ServerLauncher
             {
                 case "AccountService":
                     return new AccountProvider();
-                case "AuthenticationService":
-                    return new AuthenticationProvider();
                 case "ChatService":
                     return new ChatProvider();
                 case "InventoryService":

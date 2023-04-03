@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-
 using Common.Objects;
 using Common.Packet;
 using Discord;
@@ -11,7 +10,7 @@ using Grpc.Core;
 using Org.BouncyCastle.Asn1.Ocsp;
 using AccountSpace;
 
-namespace AccountSpace.Service
+namespace Account.Service
 {
     public class AccountService : AccountServerService.AccountServerServiceBase
     {
@@ -21,14 +20,14 @@ namespace AccountSpace.Service
         private Dictionary<string, Common.Objects.Account> _usersByEmail = new Dictionary<string, Common.Objects.Account>();
         private Dictionary<string, Common.Objects.Account> _usersByUsername = new Dictionary<string, Common.Objects.Account>();
 
-        private AccountChannel _channel;
+        private AccountChannel _channel = new AccountChannel();
         private Server _server;
 
         public AccountService(string address, int port)
         {
             _server = gRPCServerStart(address, port);
-            _channel = new AccountChannel();
             _server.Start();
+            Initialize();
             // _emailService = emailService;
         }
 
@@ -54,14 +53,16 @@ namespace AccountSpace.Service
             return true;
         }
 
-        public override Task<LoginRes> Login(LoginReq request, ServerCallContext context)
+        public override async Task<LoginRes> Login(LoginReq request, ServerCallContext context)
         {
-            return Task.FromResult(new LoginRes
+            var authRes = await _channel.LoginAuth(request.Username, request.Password);
+
+            return new LoginRes
             {
-                Username = request.Username,
-                Message = "Success",
-                StatusCode = 200,
-            });
+                Username = authRes.UserId,
+                Message = authRes.Token,
+                StatusCode = authRes.StatusCode,
+            };
         }
         
         public override Task<ConnectRes> Connect(ConnectReq request, ServerCallContext context)
@@ -82,16 +83,22 @@ namespace AccountSpace.Service
             return server;
         }
 
-        private void ConnectChannel(string serviceName, string address, int port)
+        private void Initialize()
         {
-            _channel.AddChannel(serviceName, address, port);
+            // TODO: 제네릭 타입 이용해서 수정할 것
+            ConnectServer<>("DB", "127.0.0.1", 6805);
+        }
+
+        public async Task ConnectServer<T>(string serviceName, string address, int port) where T : ClientBase<T>
+        {
+            await _channel.AddChannel<T>(serviceName, address, port);
         }
 
         public bool ResetPassword(string email, string newPassword)
         {
             if (!_usersByEmail.ContainsKey(email))
             {
-                return false; // User not found
+                return false;
             }
 
             var user = _usersByEmail[email];
@@ -119,7 +126,6 @@ namespace AccountSpace.Service
                 return false;
             }
 
-            // 최소 3자, 최대 30자, 알파벳 대소문자 및 숫자만 허용
             return Regex.IsMatch(username, @"^[a-zA-Z0-9]{3,30}$");
         }
 
@@ -130,7 +136,6 @@ namespace AccountSpace.Service
                 return false;
             }
 
-            // 간단한 이메일 형식 검사
             return Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
         }
 

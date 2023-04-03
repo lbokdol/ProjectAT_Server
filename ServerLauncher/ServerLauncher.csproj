@@ -26,7 +26,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Account\Account.csproj" />
-    <ProjectReference Include="..\Authentication\Authentication.csproj" />
     <ProjectReference Include="..\BackOffice\BackOffice.csproj" />
     <ProjectReference Include="..\Chat\Chat.csproj" />
     <ProjectReference Include="..\Common\Common.csproj" />
