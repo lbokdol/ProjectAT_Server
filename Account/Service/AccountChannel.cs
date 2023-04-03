@@ -1,30 +1,60 @@
 ﻿using Grpc.Core;
+using Common;
 using System.Runtime.CompilerServices;
+using System.Collections.Concurrent;
+using AccountSpace;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace AccountSpace.Service
+namespace Account.Service
 {
     public class AccountChannel : AuthService.AuthServiceClient
     {
-        private Dictionary<Guid, Common.Network.Channel> _channels;
-        private string _authService = "";
+        private ConcurrentDictionary<string, List<ClientBase>> _channels = new ConcurrentDictionary<string, List<ClientBase>>();
+        private ConcurrentDictionary<string, LoadBalancer> serviceLB = new ConcurrentDictionary<string, LoadBalancer>();
+
         public AccountChannel()
         {
-            _channels = new Dictionary<Guid, Common.Network.Channel>();
+
         }
 
-        public void AddChannel(string serviceName, string address, int port)
+        public async Task AddChannel<T>(string serviceName, string address, int port) where T : ClientBase<T>
         {
-            _channels.Add(Guid.NewGuid(), new Common.Network.Channel() { ServiceName = serviceName, Address = address, Port = port });
+            var channel = new Channel($"https://{address}:{port}", ChannelCredentials.Insecure);
+            var client =(T)Activator.CreateInstance(typeof(T), channel);
+
+            if (_channels.ContainsKey(serviceName) == false)
+            {
+                _channels.TryAdd(serviceName, new List<ClientBase>());
+            }
+
+            _channels[serviceName].Add(client);
+
+            if (serviceLB.ContainsKey(serviceName) == false)
+                serviceLB.TryAdd(serviceName, new LoadBalancer(_channels[serviceName]));
+
+            serviceLB[serviceName].AddServer(client);
         }
 
-        public string LoginAuth(string username, string password)
+        public async Task<AuthRes> LoginAuth(string username, string password)
         {
-            Channel channel = new Channel(_authService, ChannelCredentials.Insecure);
-            var client = new AuthService.AuthServiceClient(channel);
+            var client = serviceLB["DB"].GetNextServer() as AuthService.AuthServiceClient;
+            if (client == null)
+            {
+                LoggingService.LogError($"not_found_db_client");
 
-            var response = client.Auth(new AuthReq { Username= username, Password= password });
+                return null;
+            }
 
-            return response.Message;
+            var response = client.Auth(new AuthReq { Username= username, Password = password });
+            response.Token = Tools.TokenGenerator.GenerateToken(username, "설정 파일 또는 db에서 키 값 가져와서 적용해야됨");
+            if (response == null)
+            {
+                LoggingService.LogError($"authorization_response_is_null_error");
+                return null;
+            }
+
+            return response;
         }
+
     }
 }

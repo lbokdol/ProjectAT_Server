@@ -1,8 +1,8 @@
 ﻿using Common;
 using Common.Interface;
-using AccountSpace.Service;
+using Account.Service;
 
-namespace AccountSpace
+namespace Account
 {
     public class AccountProvider : Common.Interface.IServiceProvider
     {

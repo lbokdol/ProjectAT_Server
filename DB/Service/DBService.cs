@@ -7,65 +7,51 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.ComponentModel.DataAnnotations;
 using Common.Objects;
+using DB;
+using Grpc.Core;
 
 namespace DB.Service
 {
-    public class AccountDbContext : DbContext
+    public class DBService : DBServer.DBServerBase
     {
-        public DbSet<Account> Accounts { get; set; }
+        private DBServiceManager _dbServiceManager = new DBServiceManager();
 
-        public AccountDbContext(DbContextOptions<AccountDbContext> options) : base(options) { }
-    }
-
-    public class DBService
-    {
-        private AccountDbContext _dbContext;
-
-        public DBService(AccountDbContext dbContext)
+        public DBService() 
         {
-            _dbContext = dbContext;
+        
         }
 
-        public async Task<bool> RegisterAsync(Account account)
+        public async Task<bool> RegisterAsync(Common.Objects.Account account)
         {
-            if (await AccountExistsAsync(account.Email, account.Username))
+            return await _dbServiceManager.RegisterAsync(account);
+        }
+
+        public async Task<Common.Objects.Account> GetAccountByEmailAsync(string email)
+        {
+            return await _dbServiceManager.GetAccountByEmailAsync(email);
+        }
+
+        public async Task<Common.Objects.Account> GetAccountByUsernameAsync(string username)
+        {
+            return await _dbServiceManager.GetAccountByUsernameAsync(username);
+        }
+
+        public async Task<bool> UpdateAccountAsync(Common.Objects.Account account)
+        {
+            return await _dbServiceManager.UpdateAccountAsync(account);
+        }
+
+        public override async Task<LoginRes> Login(LoginReq request, ServerCallContext context)
+        {
+            var result = await _dbServiceManager.ProcessLogin(request.Username, request.Password);
+
+            //에러코드 정리되면 메시지랑 Statuscode 넣어줘야함
+            return new LoginRes
             {
-                return false; // Email or username already exists
-            }
-
-            _dbContext.Accounts.Add(account);
-            await _dbContext.SaveChangesAsync();
-            return true;
-        }
-
-        public async Task<Account> GetAccountByEmailAsync(string email)
-        {
-            return await _dbContext.Accounts.SingleOrDefaultAsync(a => a.Email == email);
-        }
-
-        public async Task<Account> GetAccountByUsernameAsync(string username)
-        {
-            return await _dbContext.Accounts.SingleOrDefaultAsync(a => a.Username == username);
-        }
-
-        public async Task<bool> UpdateAccountAsync(Account account)
-        {
-            _dbContext.Entry(account).State = EntityState.Modified;
-            try
-            {
-                await _dbContext.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        private async Task<bool> AccountExistsAsync(string email, string username)
-        {
-            return await _dbContext.Accounts.AnyAsync(a => a.Email == email || a.Username == username);
+                Username = request.Username,
+                Message = "",
+                StatusCode = result,
+            };
         }
     }
 }

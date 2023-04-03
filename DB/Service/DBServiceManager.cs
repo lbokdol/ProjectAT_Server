@@ -1,47 +1,81 @@
 ﻿using Common.Interface;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Grpc.Net.Client;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.ComponentModel.DataAnnotations;
+using Common.Objects;
 
 namespace DB.Service
 {
-    public class DBServiceManager : IServiceManager
+    public class AccountDbContext : DbContext
     {
-        Greeter.GreeterClient _client;
+        public DbSet<Account> Accounts { get; set; }
+
+        public AccountDbContext(DbContextOptions<AccountDbContext> options) : base(options) { }
+    }
+    public class DBServiceManager : DbContext
+    {
+        private AccountDbContext _dbContext = new AccountDbContext(new DbContextOptions<AccountDbContext>());
 
         public DBServiceManager()
         {
-            Initialize();
-        }
-
-        public void Initialize()
-        {
-            ConnectChannel();
-        }
-
-        public void Shutdown()
-        {
 
         }
 
-        public async Task SendAsync(string msg)
+        public async Task<bool> RegisterAsync(Account account)
         {
-            var reply = await _client.SayHelloAsync(new HelloRequest { Name = msg });
-            Console.WriteLine(reply.Message);
+            if (await AccountExistsAsync(account.Email, account.Username))
+            {
+                return false; // Email or username already exists
+            }
+
+            _dbContext.Accounts.Add(account);
+            await _dbContext.SaveChangesAsync();
+            return true;
         }
 
-        public void ConnectChannel()
+        public async Task<Account> GetAccountByEmailAsync(string email)
         {
-            var channel = GrpcChannel.ForAddress("https://localhost:5001");
-            _client = new Greeter.GreeterClient(channel);
+            return await _dbContext.Accounts.SingleOrDefaultAsync(a => a.Email == email);
         }
 
-        public void DisconnectChannel()
+        public async Task<Account> GetAccountByUsernameAsync(string username)
         {
+            return await _dbContext.Accounts.SingleOrDefaultAsync(a => a.Username == username);
+        }
 
+        public async Task<bool> UpdateAccountAsync(Account account)
+        {
+            _dbContext.Entry(account).State = EntityState.Modified;
+            try
+            {
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private async Task<bool> AccountExistsAsync(string email, string username)
+        {
+            return await _dbContext.Accounts.AnyAsync(a => a.Email == email || a.Username == username);
+        }
+
+        public async Task<int> ProcessLogin(string username, string password)
+        {
+            // TODO: 에러코드 정리해야됨
+            var account = await _dbContext.Accounts.SingleOrDefaultAsync(a => a.Username == username && a.PasswordHash == password);
+            if (account == null) 
+            {
+                return 404;
+            }
+
+            return 200;
         }
     }
 }

@@ -5,10 +5,6 @@
         "IPAddress": "127.0.0.1",
         "Port": 6801
       },
-      "AuthenticationService": {
-        "IPAddress": "127.0.0.1",
-        "Port": 6802
-      },
       "ChatService": {
         "IPAddress": "127.0.0.1",
         "Port": 6803
