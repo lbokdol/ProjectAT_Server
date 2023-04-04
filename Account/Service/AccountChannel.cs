@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Account.Service
 {
-    public class AccountChannel : AuthService.AuthServiceClient
+    public class AccountChannel : AccountServerService.AccountServerServiceClient
     {
         private ConcurrentDictionary<string, List<ClientBase>> _channels = new ConcurrentDictionary<string, List<ClientBase>>();
         private ConcurrentDictionary<string, LoadBalancer> serviceLB = new ConcurrentDictionary<string, LoadBalancer>();
@@ -19,7 +19,7 @@ namespace Account.Service
 
         public async Task AddChannel<T>(string serviceName, string address, int port) where T : ClientBase<T>
         {
-            var channel = new Channel($"https://{address}:{port}", ChannelCredentials.Insecure);
+            var channel = new Channel($"{address}:{port}", ChannelCredentials.Insecure);
             var client =(T)Activator.CreateInstance(typeof(T), channel);
 
             if (_channels.ContainsKey(serviceName) == false)
@@ -37,23 +37,33 @@ namespace Account.Service
 
         public async Task<AuthRes> LoginAuth(string username, string password)
         {
-            var client = serviceLB["DB"].GetNextServer() as AuthService.AuthServiceClient;
+            var client = serviceLB["DB"].GetNextServer() as DBServer.DBServerClient;
             if (client == null)
             {
                 LoggingService.LogError($"not_found_db_client");
 
                 return null;
             }
-
-            var response = client.Auth(new AuthReq { Username= username, Password = password });
-            response.Token = Tools.TokenGenerator.GenerateToken(username, "설정 파일 또는 db에서 키 값 가져와서 적용해야됨");
+            var request = new LoginReq 
+            {
+                Username = username,
+                Password = password,
+            };
+            var response = client.Login(request);
             if (response == null)
             {
                 LoggingService.LogError($"authorization_response_is_null_error");
                 return null;
             }
 
-            return response;
+            var result = new AuthRes()
+            {
+                UserId = username,
+                Token = Tools.TokenGenerator.GenerateToken(username, "설정 파일 또는 db에서 키 값 가져와서 적용해야됨"),
+                StatusCode = response.StatusCode,
+            };
+
+            return result;
         }
 
     }

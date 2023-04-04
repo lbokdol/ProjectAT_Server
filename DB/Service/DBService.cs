@@ -9,16 +9,18 @@ using System.ComponentModel.DataAnnotations;
 using Common.Objects;
 using DB;
 using Grpc.Core;
+using System.Net;
 
 namespace DB.Service
 {
     public class DBService : DBServer.DBServerBase
     {
         private DBServiceManager _dbServiceManager = new DBServiceManager();
-
-        public DBService() 
+        private Server _server;
+        public DBService(string address, int port) 
         {
-        
+            _server = gRPCServerStart(address, port);
+            _server.Start();
         }
 
         public async Task<bool> RegisterAsync(Common.Objects.Account account)
@@ -52,6 +54,17 @@ namespace DB.Service
                 Message = "",
                 StatusCode = result,
             };
+        }
+
+        private Server gRPCServerStart(string address, int port)
+        {
+            Server server = new Server
+            {
+                Services = { DBServer.BindService(this) },
+                Ports = { new ServerPort(address, port, ServerCredentials.Insecure) }
+            };
+
+            return server;
         }
     }
 }
