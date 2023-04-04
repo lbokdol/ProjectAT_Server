@@ -56,6 +56,8 @@ namespace Account.Service
         public override async Task<LoginRes> Login(LoginReq request, ServerCallContext context)
         {
             var authRes = await _channel.LoginAuth(request.Username, request.Password);
+            if (authRes == null)
+                return null;
 
             return new LoginRes
             {
@@ -63,14 +65,6 @@ namespace Account.Service
                 Message = authRes.Token,
                 StatusCode = authRes.StatusCode,
             };
-        }
-        
-        public override Task<ConnectRes> Connect(ConnectReq request, ServerCallContext context)
-        {
-            return Task.FromResult(new ConnectRes
-            {
-                Message = "Connect!"
-            });
         }
 
         private Server gRPCServerStart(string address, int port)
@@ -86,7 +80,8 @@ namespace Account.Service
         private void Initialize()
         {
             // TODO: 제네릭 타입 이용해서 수정할 것
-            ConnectServer<>("DB", "127.0.0.1", 6805);
+            var task = ConnectServer<DBServer.DBServerClient>("DB", "127.0.0.1", 6805);
+            task.Wait();
         }
 
         public async Task ConnectServer<T>(string serviceName, string address, int port) where T : ClientBase<T>

@@ -4,11 +4,10 @@ option csharp_namespace = "AccountSpace";
 
 service AccountServerService {
 	rpc Login (LoginReq) returns (LoginRes);
-	rpc Connect (ConnectReq) returns (ConnectRes);
 }
 
-service AuthService {
-  rpc Auth (AuthReq) returns (AuthRes);
+service DBServer {
+  rpc Login (LoginReq) returns (LoginRes);
 }
 
 message LoginReq {
@@ -20,15 +19,6 @@ message LoginRes {
 	string username = 1;
 	int32 status_code = 2;
 	string message = 3;
-}
-
-message ConnectReq {
-	string address = 1;
-	int32 port = 2;
-}
-
-message ConnectRes {
-	string message = 1;
 }
 
 message AuthReq {

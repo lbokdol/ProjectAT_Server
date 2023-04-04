@@ -69,13 +69,21 @@ namespace DB.Service
         public async Task<int> ProcessLogin(string username, string password)
         {
             // TODO: 에러코드 정리해야됨
-            var account = await _dbContext.Accounts.SingleOrDefaultAsync(a => a.Username == username && a.PasswordHash == password);
-            if (account == null) 
+            try
+            {
+                var account = await _dbContext.Accounts.SingleOrDefaultAsync(a => a.Username == username && a.PasswordHash == password);
+                if (account == null)
+                {
+                    return 404;
+                }
+
+                return 200;
+            }
+            catch (Exception e)
             {
                 return 404;
             }
 
-            return 200;
         }
     }
 }

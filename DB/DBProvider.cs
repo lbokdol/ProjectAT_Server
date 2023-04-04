@@ -1,5 +1,6 @@
 ﻿using Common;
 using Common.Interface;
+using DB.Service;
 using System.Net;
 
 namespace DB
@@ -11,11 +12,10 @@ namespace DB
         private ServiceStatus _status = ServiceStatus.Stopped;
         private string _address;
         private int _port;
-
+        private DBService _service;
         public async Task RunAsync(string address, int port, CancellationToken cancellationToken)
         {
             cancellationToken.Register(() => _taskCompletionSource.TrySetCanceled());
-            
 
             Initialize(address, port);
 
@@ -42,6 +42,13 @@ namespace DB
         {
             _address = address;
             _port = port;
+
+            CreateService(address, port);
+        }
+
+        private void CreateService(string address, int port)
+        {
+            _service = new DBService(address, port);
         }
 
         public string GetAddress()
@@ -53,5 +60,8 @@ namespace DB
         {
             return _port;
         }
+
+
+
     }
 }
