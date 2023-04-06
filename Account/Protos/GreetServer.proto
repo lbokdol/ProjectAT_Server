@@ -10,6 +10,10 @@ service DBServer {
   rpc Login (LoginReq) returns (LoginRes);
 }
 
+service RedisServer {
+  rpc Reconnect (ReconnectReq) returns (ReconnectRes);
+}
+
 message LoginReq {
 	string username = 1;
 	string password = 2;
@@ -30,4 +34,14 @@ message AuthRes {
   string user_id = 1;
   int32 status_code = 2;
   string token = 3;
+}
+
+message ReconnectReq {
+  string username = 1;
+  string reconnectkey = 2;
+}
+
+message ReconnectRes {
+  string user_id = 1;
+  int32 status_code = 2;
 }
