@@ -74,15 +74,20 @@ namespace ServerLauncher
             _serviceCancellationToken = new CancellationTokenSource();
 
             // 서비스 인스턴스 생성 및 실행
-            List<Task> serviceTasks = new List<Task>();
+            var serviceTasks = new List<Task>();
+            
 
             foreach (var serviceName in _ServiceSettings)
             {
-                Common.Interface.IServiceProvider service = GetServiceByName(serviceName.Key, serviceName.Value.Port, 10000);
+                var serviceInfos = serviceName.Value.Services
+                                    .GroupBy(serviceInfo => serviceInfo.Name)
+                                    .ToDictionary(group => group.Key, group => group.First().Address) ?? new();
+
+                var service = GetServiceByName(serviceName.Key, serviceName.Value.Port, 10000);
                 if (service != null)
                 {
                     Console.WriteLine($"Starting {serviceName}... {serviceName.Value.IPAddress} - {serviceName.Value.Port}");
-                    serviceTasks.Add(service.RunAsync(serviceName.Value.IPAddress, serviceName.Value.Port, _serviceCancellationToken.Token));
+                    serviceTasks.Add(service.RunAsync(serviceName.Value.IPAddress, serviceName.Value.Port, serviceInfos, _serviceCancellationToken.Token));
                 }
                 else
                 {
@@ -165,7 +170,7 @@ namespace ServerLauncher
             serviceCancellationToken = new CancellationTokenSource();
 
             // 서비스 재시작
-            await service.RunAsync(service.GetAddress(), service.GetPort(), serviceCancellationToken.Token);
+            await service.RunAsync(service.GetAddress(), service.GetPort(), service.GetServices(), serviceCancellationToken.Token);
         }
 
         private async Task StopAllService()

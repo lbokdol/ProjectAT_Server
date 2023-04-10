@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.ComponentModel.DataAnnotations;
 using Common.Objects;
+using Common;
 
 namespace DB.Service
 {
@@ -66,7 +67,7 @@ namespace DB.Service
             return await _dbContext.Accounts.AnyAsync(a => a.Email == email || a.Username == username);
         }
 
-        public async Task<int> ProcessLogin(string username, string password)
+        public async Task<LoginResponseType> ProcessLogin(string username, string password)
         {
             // TODO: 에러코드 정리해야됨
             try
@@ -74,14 +75,15 @@ namespace DB.Service
                 var account = await _dbContext.Accounts.SingleOrDefaultAsync(a => a.Username == username && a.PasswordHash == password);
                 if (account == null)
                 {
-                    return 404;
+                    return LoginResponseType.NOT_FOUND;
                 }
 
-                return 200;
+                return LoginResponseType.SUCCESS;
             }
             catch (Exception e)
             {
-                return 404;
+                LoggingService.LogError($"[Event=ProcessLogin] [Exception={e}]");
+                return LoginResponseType.UNKNOWN_ERROR;
             }
 
         }

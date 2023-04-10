@@ -2,18 +2,18 @@
 
 namespace Common
 {
-    public class LoadBalancer
+    public class LoadBalancer<T>
     {
-        private List<ClientBase> _servers;
+        private List<T> _servers;
         private int _currentServerIndex;
 
-        public LoadBalancer(List<ClientBase> servers)
+        public LoadBalancer(List<T> servers)
         {
             _servers = servers;
             _currentServerIndex = 0;
         }
 
-        public ClientBase GetNextServer()
+        public T GetNextServer()
         {
             if (_servers.Count == 0)
             {
@@ -25,7 +25,7 @@ namespace Common
             return nextServer;
         }
 
-        public void AddServer(ClientBase server)
+        public void AddServer(T server)
         {
             _servers.Add(server);
         }

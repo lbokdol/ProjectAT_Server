@@ -9,7 +9,12 @@ using AccountSpace;
 
 namespace Session.Client
 {
-    public class AccountServiceClient
+    public interface IServiceClient
+    {
+
+    }
+
+    public class AccountServiceClient: IServiceClient
     {
         private readonly AccountServerService.AccountServerServiceClient _client;
 
