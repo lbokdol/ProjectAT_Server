@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+
 using System.Net.Sockets;
 using System.Net;
 using System.Security.Cryptography;
@@ -13,6 +15,9 @@ using Common.Packet;
 using AccountSpace;
 
 using MessagePack;
+using Grpc.Core;
+using System.Collections.Concurrent;
+using Session.Client;
 
 namespace Session
 {
@@ -23,7 +28,9 @@ namespace Session
         private readonly SemaphoreSlim _connectionSemaphore;
         private readonly SymmetricAlgorithm _encryptionAlgorithm = Aes.Create();
         private readonly string _secretKey = "tlzmfltzl";
-        private Client.AccountServiceClient _accountClient;
+
+        private Dictionary<string, List<string>> _serviceInfos;
+        private ConcurrentDictionary<string, LoadBalancer<IServiceClient>> serviceLB = new();
 
         private string _address;
         private int _port;
@@ -32,12 +39,9 @@ namespace Session
         {
             _maxConnections = maxConnections;
             _connectionSemaphore = new SemaphoreSlim(maxConnections, maxConnections);
-
-            // 주소와 포트 받아와야함 고민할 것
-            _accountClient = new Client.AccountServiceClient("localhost:6801");
         }
 
-        public async Task RunAsync(string address, int port, CancellationToken cancellationToken)
+        public async Task RunAsync(string address, int port, Dictionary<string, List<string>> serviceInfos, CancellationToken cancellationToken)
         {
             try
             {
@@ -45,7 +49,7 @@ namespace Session
                 _encryptionAlgorithm.IV = Encoding.UTF8.GetBytes("abc-htd-hjb-lgfh");
                 _encryptionAlgorithm.Padding = PaddingMode.PKCS7;
 
-                Initialize(address, port);
+                Initialize(address, port, serviceInfos);
 
                 var listener = new TcpListener(IPAddress.Parse(address), port);
                 listener.Start();
@@ -215,7 +219,15 @@ namespace Session
 
         private async Task<LoginRes> AuthenticateUserAsync(LoginReq request)
         {
-            var response = await _accountClient.LoginAsync(request);
+            var accountClient = serviceLB["AccountService"].GetNextServer() as AccountServiceClient;
+            if (accountClient == null)
+            {
+                // TODO: 에러코드 정리
+                return new LoginRes() { StatusCode = 500, Message = "Account Service is not available" };
+            }
+
+            var response = await accountClient.LoginAsync(request);
+
             return response;
         }
 
@@ -224,10 +236,37 @@ namespace Session
             return Task<bool>.FromResult(true);
         }
 
-        private void Initialize(string address, int port)
+        private void Initialize(string address, int port, Dictionary<string, List<string>> serviceInfos)
         {
             _address = address;
             _port = port;
+            _serviceInfos = serviceInfos;
+
+            RegistService(serviceInfos);
+        }
+
+        private void RegistService(Dictionary<string, List<string>> serviceInfos)
+        {
+            Parallel.ForEach(serviceInfos.Keys, serviceName =>
+            {
+                switch (serviceName)
+                {
+                    case "AccountService":
+                        foreach (var serviceDNS in serviceInfos[serviceName])
+                        {
+                            serviceLB[serviceName].AddServer(new AccountServiceClient(serviceDNS));
+                        }
+                        break;
+
+                    case "WorldService":
+                        foreach (var serviceDNS in serviceInfos[serviceName])
+                        {
+                            // TODO: world 서비스 구현 시 구현할 것
+                            //serviceLB[serviceName].AddServer(new WorldServiceClient(serviceDNS));
+                        }
+                        break;
+                }
+            });
         }
 
         public string GetAddress()
@@ -238,6 +277,11 @@ namespace Session
         public int GetPort()
         {
             return _port;
+        }
+
+        public Dictionary<string, List<string>> GetServices()
+        {
+            return _serviceInfos;
         }
     }
 }

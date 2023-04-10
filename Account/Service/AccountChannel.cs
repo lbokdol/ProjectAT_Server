@@ -11,7 +11,7 @@ namespace Account.Service
     public class AccountChannel : AccountServerService.AccountServerServiceClient
     {
         private ConcurrentDictionary<string, List<ClientBase>> _channels = new ConcurrentDictionary<string, List<ClientBase>>();
-        private ConcurrentDictionary<string, LoadBalancer> serviceLB = new ConcurrentDictionary<string, LoadBalancer>();
+        private ConcurrentDictionary<string, LoadBalancer<ClientBase>> serviceLB = new ConcurrentDictionary<string, LoadBalancer<ClientBase>>();
 
         public AccountChannel()
         {
@@ -31,7 +31,7 @@ namespace Account.Service
             _channels[serviceName].Add(client);
 
             if (serviceLB.ContainsKey(serviceName) == false)
-                serviceLB.TryAdd(serviceName, new LoadBalancer(_channels[serviceName]));
+                serviceLB.TryAdd(serviceName, new LoadBalancer<ClientBase>(_channels[serviceName]));
 
             serviceLB[serviceName].AddServer(client);
         }

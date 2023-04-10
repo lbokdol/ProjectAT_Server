@@ -12,14 +12,15 @@ namespace Account
         private AccountService _service;
         private string _address;
         private int _port;
+        private Dictionary<string, List<string>> _serviceInfos;
 
-        public async Task RunAsync(string address, int port, CancellationToken cancellationToken)
+        public async Task RunAsync(string address, int port, Dictionary<string, List<string>> serviceInfos,CancellationToken cancellationToken)
         {
             cancellationToken.Register(() => _taskCompletionSource.TrySetCanceled());
 
             _status = ServiceStatus.Running;
 
-            Initialize(address, port);
+            Initialize(address, port, serviceInfos);
 
             try
             {
@@ -39,10 +40,11 @@ namespace Account
         }
         public ServiceStatus Status => _status;
 
-        private void Initialize(string address, int port)
+        private void Initialize(string address, int port, Dictionary<string, List<string>> serviceInfos)
         {
             _address = address;
             _port = port;
+            _serviceInfos = serviceInfos;
 
             CreateService(address, port);
         }
@@ -60,6 +62,11 @@ namespace Account
         public int GetPort()
         {
             return _port;
+        }
+
+        public Dictionary<string, List<string>> GetServices()
+        {
+            return _serviceInfos;
         }
     }
 }

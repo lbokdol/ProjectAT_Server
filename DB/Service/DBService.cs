@@ -52,7 +52,7 @@ namespace DB.Service
             {
                 Username = request.Username,
                 Message = "",
-                StatusCode = result,
+                StatusCode = (int)result,
             };
         }
 

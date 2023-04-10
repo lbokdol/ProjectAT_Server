@@ -19,6 +19,8 @@ namespace Common.Objects
     {
         SUCCESS = 200,
 
+        NOT_FOUND = 404,
+
         UNKNOWN_ERROR = 999,
 
         INVALID_USERNAME = 1001,
