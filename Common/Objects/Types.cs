@@ -15,11 +15,12 @@ namespace Common.Objects
         Select,
     }
 
-    public enum LoginResponseType
+    public enum ResponseType
     {
         SUCCESS = 200,
 
         NOT_FOUND = 404,
+        ALREADYEXIST = 405,
 
         UNKNOWN_ERROR = 999,
 

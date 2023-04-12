@@ -42,7 +42,6 @@ namespace Account.Service
             {
                 UserId = username,
                 Token = Tools.TokenGenerator.GenerateToken($"{username}:{password}", "설정 파일 또는 db에서 키 값 가져와서 적용해야됨"),
-                StatusCode = (int)Common.Objects.LoginResponseType.SUCCESS,
             };
 
             var request = new LoginReq
@@ -65,7 +64,7 @@ namespace Account.Service
             {
                 UserId = username,
                 Token = reconnectKey,
-                StatusCode = (int)LoginResponseType.SUCCESS,
+                StatusCode = (int)ResponseType.SUCCESS,
             };
 
             var request = new ReconnectReq
@@ -79,44 +78,44 @@ namespace Account.Service
             return authResponse;
         }
 
-        private LoginResponseType GetLoginAuthInfo(LoginReq request)
+        private ResponseType GetLoginAuthInfo(LoginReq request)
         {
 
             var db = serviceLB["DB"].GetNextServer() as DBServer.DBServerClient;
             if (db == null)
             {
                 LoggingService.LogError($"not_found_db_client");
-                return LoginResponseType.NOT_FOUND;
+                return ResponseType.NOT_FOUND;
             }
 
             var response = db.Login(request);
             if (response == null)
             {
                 LoggingService.LogError($"authorization_response_is_null_error");
-                return LoginResponseType.UNKNOWN_ERROR;
+                return ResponseType.UNKNOWN_ERROR;
             }
 
-            return (LoginResponseType)Enum.Parse(typeof(LoginResponseType), response.StatusCode.ToString());
+            return (ResponseType)Enum.Parse(typeof(ResponseType), response.StatusCode.ToString());
         }
 
-        private LoginResponseType ReConnectedAccount(ReconnectReq request)
+        private ResponseType ReConnectedAccount(ReconnectReq request)
         {
             var redis = serviceLB["Redis"].GetNextServer() as RedisServer.RedisServerClient;
             if (redis == null)
             {
                 LoggingService.LogError($"not_found_redis_client");
 
-                return LoginResponseType.NOT_FOUND;
+                return ResponseType.NOT_FOUND;
             }
 
             var response = redis.Reconnect(request);
             if (response == null)
             {
                 LoggingService.LogError($"redis_response_is_null_error");
-                return LoginResponseType.UNKNOWN_ERROR;
+                return ResponseType.UNKNOWN_ERROR;
             }
 
-            return (LoginResponseType)Enum.Parse(typeof(LoginResponseType), response.StatusCode.ToString());
+            return (ResponseType)Enum.Parse(typeof(ResponseType), response.StatusCode.ToString());
         }
 
 

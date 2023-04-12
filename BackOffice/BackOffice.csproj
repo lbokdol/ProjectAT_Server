@@ -7,13 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.22.1" />
+    <PackageReference Include="Grpc.Core" Version="2.46.6" />
+    <PackageReference Include="Grpc.Tools" Version="2.53.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Protos\greet.proto">
-      <GrpcServices>Client</GrpcServices>
-    </None>
+    <ProjectReference Include="..\Common\Common.csproj" />
+	  <Protobuf Include="Protos\GreetClient.proto" GrpcServices="Client" />
   </ItemGroup>
 
 </Project>

@@ -28,7 +28,7 @@ namespace Account.Manager
             {
                 Id = Guid.NewGuid(),
                 Username = username,
-                PasswordHash = HashPassword(password),
+                Password = HashPassword(password),
                 Email = email
             };
 
@@ -43,7 +43,7 @@ namespace Account.Manager
 
             //로그인 상태에서 비밀번호 변경 요청을 할 것이기 때문에 현재 비밀번호랑 대조할 필요 없을듯
 
-            account.PasswordHash = HashPassword(newPassword);
+            account.Password = HashPassword(newPassword);
             account.Email = newEmail;
 
             _account.Add((DBWorkType.Update, account));

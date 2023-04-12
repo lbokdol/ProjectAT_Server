@@ -4,10 +4,12 @@ option csharp_namespace = "AccountSpace";
 
 service AccountServerService {
 	rpc Login (LoginReq) returns (LoginRes);
+	rpc Register (RegisterReq) returns (RegisterRes);
 }
 
 service DBServer {
   rpc Login (LoginReq) returns (LoginRes);
+  rpc Register (RegisterReq) returns (RegisterRes);
 }
 
 service RedisServer {
@@ -44,4 +46,17 @@ message ReconnectReq {
 message ReconnectRes {
   string user_id = 1;
   int32 status_code = 2;
+}
+
+message RegisterReq {
+	string id = 1;
+	string username = 2;
+	string email = 3;
+	string password = 4;
+	bool emailverified = 5;
+}
+
+message RegisterRes {
+	string username = 1;
+	int32 status_code = 2;
 }

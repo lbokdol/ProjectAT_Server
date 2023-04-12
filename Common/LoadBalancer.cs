@@ -1,6 +1,4 @@
-﻿using Grpc.Core;
-
-namespace Common
+﻿namespace Common
 {
     public class LoadBalancer<T>
     {
