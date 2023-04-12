@@ -3,7 +3,8 @@
 option csharp_namespace = "DB";
 
 service DBServer {
-  rpc Login (LoginReq) returns (LoginRes);
+	rpc Login (LoginReq) returns (LoginRes);
+	rpc Register (RegisterReq) returns (RegisterRes);
 }
 
 message LoginReq {
@@ -15,4 +16,17 @@ message LoginRes {
 	string username = 1;
 	int32 status_code = 2;
 	string message = 3;
+}
+
+message RegisterReq {
+	string id = 1;
+	string username = 2;
+	string email = 3;
+	string password = 4;
+	bool emailverified = 5;
+}
+
+message RegisterRes {
+	string username = 1;
+	int32 status_code = 2;
 }

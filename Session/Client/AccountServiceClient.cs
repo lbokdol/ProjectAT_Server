@@ -28,5 +28,10 @@ namespace Session.Client
         {
             return await _client.LoginAsync(request);
         }
+
+        public async Task<RegisterRes> RegisterAsync(RegisterReq request)
+        {
+            return await _client.RegisterAsync(request);
+        }
     }
 }

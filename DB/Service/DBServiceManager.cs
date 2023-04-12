@@ -16,7 +16,8 @@ namespace DB.Service
 
         public AccountDbContext(DbContextOptions<AccountDbContext> options) : base(options) { }
     }
-    public class DBServiceManager : DbContext
+
+    public class DBServiceManager
     {
         private AccountDbContext _dbContext = new AccountDbContext(new DbContextOptions<AccountDbContext>());
 
@@ -25,16 +26,19 @@ namespace DB.Service
 
         }
 
-        public async Task<bool> RegisterAsync(Account account)
+        public async Task<ResponseType> RegisterAsync(Account account)
         {
             if (await AccountExistsAsync(account.Email, account.Username))
             {
-                return false; // Email or username already exists
+                return ResponseType.ALREADYEXIST;
             }
 
             _dbContext.Accounts.Add(account);
-            await _dbContext.SaveChangesAsync();
-            return true;
+
+            var response = await _dbContext.SaveChangesAsync();
+            Console.WriteLine(response);
+
+            return ResponseType.SUCCESS;
         }
 
         public async Task<Account> GetAccountByEmailAsync(string email)
@@ -67,25 +71,24 @@ namespace DB.Service
             return await _dbContext.Accounts.AnyAsync(a => a.Email == email || a.Username == username);
         }
 
-        public async Task<LoginResponseType> ProcessLogin(string username, string password)
+        public async Task<ResponseType> ProcessLogin(string username, string password)
         {
             // TODO: 에러코드 정리해야됨
             try
             {
-                var account = await _dbContext.Accounts.SingleOrDefaultAsync(a => a.Username == username && a.PasswordHash == password);
+                var account = await _dbContext.Accounts.SingleOrDefaultAsync(a => a.Username == username && a.Password == password);
                 if (account == null)
                 {
-                    return LoginResponseType.NOT_FOUND;
+                    return ResponseType.NOT_FOUND;
                 }
 
-                return LoginResponseType.SUCCESS;
+                return ResponseType.SUCCESS;
             }
             catch (Exception e)
             {
                 LoggingService.LogError($"[Event=ProcessLogin] [Exception={e}]");
-                return LoginResponseType.UNKNOWN_ERROR;
+                return ResponseType.UNKNOWN_ERROR;
             }
-
         }
     }
 }

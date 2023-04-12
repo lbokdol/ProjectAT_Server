@@ -17,9 +17,10 @@ namespace Account.Service
         //private EmailService _emailService;
         private Dictionary<Guid, string> _emailVerificationCodes = new Dictionary<Guid, string>();
 
+        // 임시
         private Dictionary<string, Common.Objects.Account> _usersByEmail = new Dictionary<string, Common.Objects.Account>();
         private Dictionary<string, Common.Objects.Account> _usersByUsername = new Dictionary<string, Common.Objects.Account>();
-
+        //
         private AccountChannel _channel = new AccountChannel();
         private Server _server;
 
@@ -29,28 +30,6 @@ namespace Account.Service
             _server.Start();
             Initialize();
             // _emailService = emailService;
-        }
-
-        public bool Register(string username, string email, string password)
-        {
-            if (!ValidateUsername(username) || !ValidateEmail(email) || !ValidatePassword(password))
-            {
-                return false;
-            }
-
-            SendEmailVerification(email);
-
-            var user = new Common.Objects.Account
-            {
-                Id = Guid.NewGuid(),
-                Username = username,
-                Email = email,
-                PasswordHash = HashPassword(password)
-            };
-
-            _usersByEmail[email] = user;
-            _usersByUsername[username] = user;
-            return true;
         }
 
         public override async Task<LoginRes> Login(LoginReq request, ServerCallContext context)
@@ -97,7 +76,7 @@ namespace Account.Service
             }
 
             var user = _usersByEmail[email];
-            user.PasswordHash = HashPassword(newPassword);
+            user.Password = HashPassword(newPassword);
             return true;
         }
 
@@ -112,70 +91,6 @@ namespace Account.Service
         {
             string passwordHash = HashPassword(password);
             return hashedPassword.Equals(passwordHash);
-        }
-
-        public bool ValidateUsername(string username)
-        {
-            if (string.IsNullOrWhiteSpace(username))
-            {
-                return false;
-            }
-
-            return Regex.IsMatch(username, @"^[a-zA-Z0-9]{3,30}$");
-        }
-
-        public bool ValidateEmail(string email)
-        {
-            if (string.IsNullOrWhiteSpace(email))
-            {
-                return false;
-            }
-
-            return Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
-        }
-
-        public bool ValidatePassword(string password)
-        {
-            if (string.IsNullOrWhiteSpace(password))
-            {
-                return false;
-            }
-
-            // 최소 8자, 최소 하나의 대문자, 하나의 소문자, 하나의 숫자, 하나의 특수문자를 포함
-            return Regex.IsMatch(password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$");
-        }
-
-        private void SendEmailVerification(string email)
-        {
-            var user = _usersByEmail[email];
-            var verificationCode = GenerateVerificationCode();
-            _emailVerificationCodes[user.Id] = verificationCode;
-
-            string subject = "RPG Game - Email Verification";
-            string body = $"Hello {user.Username},\n\nPlease use the following verification code to complete your registration:\n\n{verificationCode}\n\nThank you,\nThe RPG Game Team";
-
-            //_emailService.SendEmail(email, user.Username, subject, body);
-        }
-
-        public bool VerifyEmail(Guid userId, string verificationCode)
-        {
-            if (!_emailVerificationCodes.ContainsKey(userId))
-            {
-                return false;
-            }
-
-            bool isVerified = _emailVerificationCodes[userId] == verificationCode;
-            if (isVerified)
-            {
-                _emailVerificationCodes.Remove(userId);
-            }
-            return isVerified;
-        }
-
-        private string GenerateVerificationCode()
-        {
-            var random = new Random();
-            return random.Next(100000, 999999).ToString();
         }
     }
 }

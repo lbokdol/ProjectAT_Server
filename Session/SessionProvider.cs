@@ -18,6 +18,7 @@ using MessagePack;
 using Grpc.Core;
 using System.Collections.Concurrent;
 using Session.Client;
+using Common.Objects;
 
 namespace Session
 {
@@ -223,10 +224,24 @@ namespace Session
             if (accountClient == null)
             {
                 // TODO: 에러코드 정리
-                return new LoginRes() { StatusCode = 500, Message = "Account Service is not available" };
+                return new LoginRes() { StatusCode = (int)ResponseType.ACCOUNT_DISABLED, Message = "Account Service is not available" };
             }
 
             var response = await accountClient.LoginAsync(request);
+
+            return response;
+        }
+
+        private async Task<RegisterRes> RegistAccountAsync(RegisterReq request)
+        {
+            var accountClient = serviceLB["AccountService"].GetNextServer() as AccountServiceClient;
+            if (accountClient == null)
+            {
+
+                return new RegisterRes() { StatusCode = (int)ResponseType.ACCOUNT_DISABLED };
+            }
+
+            var response = await accountClient.RegisterAsync(request);
 
             return response;
         }

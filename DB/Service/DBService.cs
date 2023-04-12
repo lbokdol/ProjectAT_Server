@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.ComponentModel.DataAnnotations;
 using Common.Objects;
-using DB;
 using Grpc.Core;
 using System.Net;
 
@@ -23,24 +22,40 @@ namespace DB.Service
             _server.Start();
         }
 
-        public async Task<bool> RegisterAsync(Common.Objects.Account account)
-        {
-            return await _dbServiceManager.RegisterAsync(account);
-        }
-
-        public async Task<Common.Objects.Account> GetAccountByEmailAsync(string email)
+        public async Task<Account> GetAccountByEmailAsync(string email)
         {
             return await _dbServiceManager.GetAccountByEmailAsync(email);
         }
 
-        public async Task<Common.Objects.Account> GetAccountByUsernameAsync(string username)
+        public async Task<Account> GetAccountByUsernameAsync(string username)
         {
             return await _dbServiceManager.GetAccountByUsernameAsync(username);
         }
 
-        public async Task<bool> UpdateAccountAsync(Common.Objects.Account account)
+        public async Task<bool> UpdateAccountAsync(Account account)
         {
             return await _dbServiceManager.UpdateAccountAsync(account);
+        }
+
+        public override async Task<RegisterRes> Register(RegisterReq account, ServerCallContext context)
+        {
+            var newAccount = new Account
+            {
+                Id = Guid.Parse(account.Id),
+                Username = account.Username,
+                Email = account.Email,
+                Password = account.Password,
+                EmailVerified = account.Emailverified,
+            };
+            var resultCode = await _dbServiceManager.RegisterAsync(newAccount);
+
+            RegisterRes response = new RegisterRes()
+            {
+                Username = account.Username,
+                StatusCode = (int)resultCode,
+            };
+
+            return response;
         }
 
         public override async Task<LoginRes> Login(LoginReq request, ServerCallContext context)

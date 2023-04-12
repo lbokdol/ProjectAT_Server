@@ -35,6 +35,7 @@ namespace Common.Packet
         LoginResponse,
         MoveRequest,
         MoveResponse,
+        RegistRequest,
         // Add more packet types as needed
     }
 
@@ -58,6 +59,26 @@ namespace Common.Packet
         public string Message { get; set; }
     }
 
+    [MessagePackObject]
+    public class RegistRequest
+    {
+        [Key(0)]
+        public string Username { get; set; }
+        [Key(1)]
+        public string Password { get; set; }
+        [Key(2)]
+        public string Email { get; set; }
+
+    }
+
+    [MessagePackObject]
+    public class RegistResponse
+    {
+        [Key(0)]
+        public int StatusCode { get; set; }
+        [Key(1)]
+        public string UserName { get; set; }
+    }
     [MessagePackObject]
     public class MoveResponse
     {
