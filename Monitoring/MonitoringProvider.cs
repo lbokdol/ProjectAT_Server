@@ -22,7 +22,7 @@ namespace Monitoring
             try
             {
                 LoggingService.Logger.Information("Monitoring Service is Starting...");
-
+                _status = ServiceStatus.Running;
                 await _taskCompletionSource.Task;
             }
             catch (Exception ex)

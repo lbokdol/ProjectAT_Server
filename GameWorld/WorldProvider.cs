@@ -23,7 +23,7 @@ namespace GameWorld
             try
             {
                 LoggingService.Logger.Information("World Service is Starting...");
-
+                _status = ServiceStatus.Running;
                 await _taskCompletionSource.Task;
             }
             catch (Exception ex)

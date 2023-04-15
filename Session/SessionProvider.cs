@@ -51,7 +51,7 @@ namespace Session
                 _encryptionAlgorithm.Padding = PaddingMode.PKCS7;
 
                 Initialize(address, port, serviceInfos);
-
+                _status = ServiceStatus.Running;
                 var listener = new TcpListener(IPAddress.Parse(address), port);
                 listener.Start();
 
