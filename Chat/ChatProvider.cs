@@ -16,13 +16,13 @@ namespace Chat
         public async Task RunAsync(string address, int port, Dictionary<string, List<string>> serviceInfos, CancellationToken cancellationToken)
         {
             cancellationToken.Register(() => _taskCompletionSource.TrySetCanceled());
-
+            
             Initialize(address, port, serviceInfos);
 
             try
             {
                 LoggingService.Logger.Information("Chat Service is Starting...");
-
+                _status = ServiceStatus.Running;
                 await _taskCompletionSource.Task;
             }
             catch (Exception ex)

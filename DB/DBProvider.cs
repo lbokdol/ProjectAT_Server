@@ -24,7 +24,7 @@ namespace DB
             try
             {
                 LoggingService.Logger.Information("DB Service is Starting...");
-
+                _status = ServiceStatus.Running;
                 await _taskCompletionSource.Task;
             }
             catch (Exception ex)

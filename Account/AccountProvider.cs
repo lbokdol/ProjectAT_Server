@@ -18,13 +18,12 @@ namespace Account
         {
             cancellationToken.Register(() => _taskCompletionSource.TrySetCanceled());
 
-            _status = ServiceStatus.Running;
-
             Initialize(address, port, serviceInfos);
 
             try
             {
                 LoggingService.Logger.Information("Account Service is Starting...");
+                _status = ServiceStatus.Running;
                 await _taskCompletionSource.Task;
             }
             catch (Exception ex)

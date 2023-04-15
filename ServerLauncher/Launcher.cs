@@ -22,6 +22,7 @@ using GameWorld;
 using Monitoring;
 using DB;
 using Redis;
+using BackOffice;
 
 using ServerLauncher.gRPC;
 using Common.Interface;
@@ -79,9 +80,13 @@ namespace ServerLauncher
 
             foreach (var serviceName in _ServiceSettings)
             {
-                var serviceInfos = serviceName.Value.Services
-                                    .GroupBy(serviceInfo => serviceInfo.Name)
-                                    .ToDictionary(group => group.Key, group => group.First().Address) ?? new();
+                var serviceInfos = new Dictionary<string, List<string>>();
+                if (serviceName.Value.Services != null)
+                {
+                    serviceInfos = serviceName.Value.Services
+                    .GroupBy(serviceInfo => serviceInfo.Name)
+                    .ToDictionary(group => group.Key, group => group.First().Address) ?? new();
+                }
 
                 var service = GetServiceByName(serviceName.Key, serviceName.Value.Port, 10000);
                 if (service != null)
@@ -131,6 +136,8 @@ namespace ServerLauncher
                     return new RedisProvider();
                 case "MonitoringService":
                     return new MonitoringProvider();
+                case "BackOfficeService":
+                    return new BackOfficeProvider();
                 default:
                     return null;
             }

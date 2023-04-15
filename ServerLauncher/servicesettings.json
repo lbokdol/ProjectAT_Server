@@ -3,39 +3,53 @@
     "LEEKH": {
       "AccountService": {
         "IPAddress": "127.0.0.1",
-        "Port": 6801
+        "Port": 6801,
+        "Services": []
       },
       "ChatService": {
         "IPAddress": "127.0.0.1",
-        "Port": 6803
+        "Port": 6803,
+        "Services": []
       },
       "InventoryService": {
         "IPAddress": "127.0.0.1",
-        "Port": 6804
+        "Port": 6804,
+        "Services": []
       },
       "DBService": {
         "IPAddress": "127.0.0.1",
-        "Port": 6805
+        "Port": 6805,
+        "Services": []
       },
       "RedisService": {
         "IPAddress": "127.0.0.1",
-        "Port": 6806
+        "Port": 6806,
+        "Services": []
       },
       "PlayerService": {
         "IPAddress": "127.0.0.1",
-        "Port": 6807
+        "Port": 6807,
+        "Services": []
       },
       "SessionService": {
         "IPAddress": "127.0.0.1",
-        "Port": 6808
+        "Port": 6808,
+        "Services": []
       },
       "GameWorldService": {
         "IPAddress": "127.0.0.1",
-        "Port": 6809
+        "Port": 6809,
+        "Services": []
       },
       "MonitoringService": {
         "IPAddress": "127.0.0.1",
-        "Port": 6810
+        "Port": 6810,
+        "Services": []
+      },
+      "BackOfficeService": {
+        "IPAddress": "127.0.0.1",
+        "Port": 6811,
+        "Services": []
       }
     }
   }

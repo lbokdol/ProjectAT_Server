@@ -22,7 +22,7 @@ namespace Inventory
             try
             {
                 LoggingService.Logger.Information("Inventory Service is Starting...");
-
+                _status = ServiceStatus.Running;
                 await _taskCompletionSource.Task;
             }
             catch (Exception ex)
