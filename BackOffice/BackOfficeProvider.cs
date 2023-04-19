@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using BackOfficeService;
+using BackOfficeRpcService;
 
 namespace BackOffice
 {
@@ -26,7 +26,7 @@ namespace BackOffice
 
             Initialize(address, port, serviceInfos);
 
-            APIServer(address, 5000);
+            APIServer(address, 5000, _channel);
 
             try
             {
@@ -56,7 +56,11 @@ namespace BackOffice
 
             foreach(var service in serviceInfos.Keys)
             {
-                _channel.AddChannel<DBServer.DBServerClient>(service, serviceInfos[service][0], int.Parse(serviceInfos[service][1]));
+                foreach(var serviceInfo in serviceInfos[service])
+                {
+                    var addressPort = serviceInfo.Split(':');
+                    _channel.AddChannel<DBServer.DBServerClient>(service, addressPort[0], int.Parse(addressPort[1]));
+                }
             }
         }
 
@@ -75,21 +79,34 @@ namespace BackOffice
             return _serviceInfos;
         }
 
-        private void APIServer(string address, int port)
+        private void APIServer(string address, int port, BackOfficeChannel channel)
         {
-            _builder = Host.CreateDefaultBuilder().ConfigureWebHostDefaults(webBuilder =>
+            try
             {
-                webBuilder.UseStartup<Startup>();
-                webBuilder.UseUrls($"http://{address}:{port}");
-            });
+                _builder = Host.CreateDefaultBuilder().ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                    webBuilder.UseUrls($"http://{address}:{port}");
+                })
+                .ConfigureServices(services =>
+                {
+                    services.AddSingleton(channel);
+                });
 
-            _app = _builder.Build();
+                _app = _builder.Build();
 
-            _app.RunAsync();
+                _app.RunAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
 
         }
+
         public class Startup
         {
+
             public Startup(IConfiguration configuration)
             {
                 Configuration = configuration;
@@ -100,8 +117,7 @@ namespace BackOffice
             public void ConfigureServices(IServiceCollection services)
             {
                 services.AddControllers();
-                
-                services.AddSingleton<BackOfficeChannel>();
+
                 // 여기에 필요한 서비스들을 추가하십시오.
                 services.AddSwaggerGen(c =>
                 {
@@ -111,7 +127,7 @@ namespace BackOffice
 
             public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
             {
-                app.UseHttpsRedirection();
+                //app.UseHttpsRedirection();
 
                 app.UseRouting();
 

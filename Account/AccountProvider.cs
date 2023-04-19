@@ -14,7 +14,7 @@ namespace Account
         private int _port;
         private Dictionary<string, List<string>> _serviceInfos;
 
-        public async Task RunAsync(string address, int port, Dictionary<string, List<string>> serviceInfos,CancellationToken cancellationToken)
+        public async Task RunAsync(string address, int port, Dictionary<string, List<string>> serviceInfos, CancellationToken cancellationToken)
         {
             cancellationToken.Register(() => _taskCompletionSource.TrySetCanceled());
 
@@ -45,12 +45,12 @@ namespace Account
             _port = port;
             _serviceInfos = serviceInfos;
 
-            CreateService(address, port);
+            CreateService(address, port, serviceInfos);
         }
 
-        private void CreateService(string address, int port)
+        private void CreateService(string address, int port, Dictionary<string, List<string>> serviceInfos)
         {
-            _service = new AccountService(address, port);
+            _service = new AccountService(address, port, serviceInfos);
         }
 
         public string GetAddress()

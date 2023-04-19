@@ -4,7 +4,14 @@
       "AccountService": {
         "IPAddress": "127.0.0.1",
         "Port": 6801,
-        "Services": []
+        "Services": [
+          {
+            "Name": "DBService",
+            "Address": [
+              "127.0.0.1:6805"
+            ]
+          }
+        ]
       },
       "ChatService": {
         "IPAddress": "127.0.0.1",
@@ -34,7 +41,14 @@
       "SessionService": {
         "IPAddress": "127.0.0.1",
         "Port": 6808,
-        "Services": []
+        "Services": [
+          {
+            "Name": "AccountService",
+            "Address": [
+              "127.0.0.1:6801"
+            ]
+          }
+        ]
       },
       "GameWorldService": {
         "IPAddress": "127.0.0.1",
@@ -49,7 +63,14 @@
       "BackOfficeService": {
         "IPAddress": "127.0.0.1",
         "Port": 6811,
-        "Services": []
+        "Services": [
+          {
+            "Name": "DBService",
+            "Address": [
+              "127.0.0.1:6805"
+            ]
+          }
+        ]
       }
     }
   }

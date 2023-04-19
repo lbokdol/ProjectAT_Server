@@ -1,5 +1,5 @@
 ﻿using Grpc.Core;
-using BackOfficeService;
+using BackOfficeRpcService;
 using System.Collections.Concurrent;
 using Common;
 using Common.Objects;
@@ -16,7 +16,7 @@ namespace BackOffice.Service
 
         }
 
-        public async Task AddChannel<T>(string serviceName, string address, int port) where T : ClientBase<T>
+        public void AddChannel<T>(string serviceName, string address, int port) where T : ClientBase<T>
         {
             var channel = new Channel($"{address}:{port}", ChannelCredentials.Insecure);
             var client = (T)Activator.CreateInstance(typeof(T), channel);
@@ -43,6 +43,7 @@ namespace BackOffice.Service
 
             var request = new RegisterReq
             {
+                Id = Guid.NewGuid().ToString(),
                 Username = account.Username,
                 Email = account.Email,
                 Password = account.Password,
@@ -56,8 +57,7 @@ namespace BackOffice.Service
 
         private ResponseType GetRegistInfo(RegisterReq request)
         {
-
-            var db = serviceLB["DB"].GetNextServer() as DBServer.DBServerClient;
+            var db = serviceLB["DBService"].GetNextServer() as DBServer.DBServerClient;
             if (db == null)
             {
                 LoggingService.LogError($"not_found_db_client");

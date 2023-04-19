@@ -8,7 +8,7 @@ using Common.Packet;
 using Discord;
 using Grpc.Core;
 using Org.BouncyCastle.Asn1.Ocsp;
-using AccountSpace;
+using AccountRpcService;
 
 namespace Account.Service
 {
@@ -24,11 +24,11 @@ namespace Account.Service
         private AccountChannel _channel = new AccountChannel();
         private Server _server;
 
-        public AccountService(string address, int port)
+        public AccountService(string address, int port, Dictionary<string, List<string>> serviceInfos)
         {
             _server = gRPCServerStart(address, port);
             _server.Start();
-            Initialize();
+            Initialize(serviceInfos);
             // _emailService = emailService;
         }
 
@@ -56,16 +56,16 @@ namespace Account.Service
             return server;
         }
 
-        private void Initialize()
+        private void Initialize(Dictionary<string, List<string>> serviceInfos)
         {
-            // TODO: 제네릭 타입 이용해서 수정할 것
-            var task = ConnectServer<DBServer.DBServerClient>("DB", "127.0.0.1", 6805);
-            task.Wait();
-        }
-
-        public async Task ConnectServer<T>(string serviceName, string address, int port) where T : ClientBase<T>
-        {
-            await _channel.AddChannel<T>(serviceName, address, port);
+            foreach (var service in serviceInfos.Keys)
+            {
+                foreach (var serviceInfo in serviceInfos[service])
+                {
+                    var addressPort = serviceInfo.Split(':');
+                    _channel.AddChannel<DBServerService.DBServerServiceClient>(service, addressPort[0], int.Parse(addressPort[1]));
+                }
+            }
         }
 
         public bool ResetPassword(string email, string newPassword)

@@ -9,10 +9,11 @@ using System.ComponentModel.DataAnnotations;
 using Common.Objects;
 using Grpc.Core;
 using System.Net;
+using DBRpcService;
 
 namespace DB.Service
 {
-    public class DBService : DBServer.DBServerBase
+    public class DBService : DBServerService.DBServerServiceBase
     {
         private DBServiceManager _dbServiceManager = new DBServiceManager();
         private Server _server;
@@ -75,7 +76,7 @@ namespace DB.Service
         {
             Server server = new Server
             {
-                Services = { DBServer.BindService(this) },
+                Services = { DBServerService.BindService(this) },
                 Ports = { new ServerPort(address, port, ServerCredentials.Insecure) }
             };
 

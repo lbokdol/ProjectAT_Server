@@ -3,37 +3,30 @@ using Common;
 using Common.Objects;
 using System.Runtime.CompilerServices;
 using System.Collections.Concurrent;
-using AccountSpace;
+using AccountRpcService;
 using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
+using Account.Client;
 
 namespace Account.Service
 {
     public class AccountChannel : AccountServerService.AccountServerServiceClient
     {
-        private ConcurrentDictionary<string, List<ClientBase>> _channels = new ConcurrentDictionary<string, List<ClientBase>>();
-        private ConcurrentDictionary<string, LoadBalancer<ClientBase>> serviceLB = new ConcurrentDictionary<string, LoadBalancer<ClientBase>>();
+        //private ConcurrentDictionary<string, List<ClientBase>> _channels = new ConcurrentDictionary<string, List<ClientBase>>();
+        private ConcurrentDictionary<string, LoadBalancer<DBServiceClient>> DBServiceLB = new ConcurrentDictionary<string, LoadBalancer<DBServiceClient>>();
+        private ConcurrentDictionary<string, LoadBalancer<RedisServer.RedisServerClient>> RedisServiceLB = new ConcurrentDictionary<string, LoadBalancer<RedisServer.RedisServerClient>>();
 
         public AccountChannel()
         {
 
         }
 
-        public async Task AddChannel<T>(string serviceName, string address, int port) where T : ClientBase<T>
+        public void AddChannel<T>(string serviceName, string address, int port) where T : ClientBase<T>
         {
-            var channel = new Channel($"{address}:{port}", ChannelCredentials.Insecure);
-            var client =(T)Activator.CreateInstance(typeof(T), channel);
+            if (DBServiceLB.ContainsKey(serviceName) == false)
+                DBServiceLB.TryAdd(serviceName, new LoadBalancer<DBServiceClient>(new List<DBServiceClient>()));
 
-            if (_channels.ContainsKey(serviceName) == false)
-            {
-                _channels.TryAdd(serviceName, new List<ClientBase>());
-            }
-
-            _channels[serviceName].Add(client);
-
-            if (serviceLB.ContainsKey(serviceName) == false)
-                serviceLB.TryAdd(serviceName, new LoadBalancer<ClientBase>(_channels[serviceName]));
-
-            serviceLB[serviceName].AddServer(client);
+            DBServiceLB[serviceName].AddServer(new DBServiceClient($"{address}:{port}"));
         }
 
         public async Task<AuthRes> LoginAuth(string username, string password)
@@ -50,7 +43,7 @@ namespace Account.Service
                 Password = password,
             };
 
-            authResponse.StatusCode = (int)GetLoginAuthInfo(request);
+            authResponse.StatusCode = (int) await GetLoginAuthInfo(request);
 
             return authResponse;
         }
@@ -78,17 +71,16 @@ namespace Account.Service
             return authResponse;
         }
 
-        private ResponseType GetLoginAuthInfo(LoginReq request)
+        private async Task<ResponseType> GetLoginAuthInfo(LoginReq request)
         {
-
-            var db = serviceLB["DB"].GetNextServer() as DBServer.DBServerClient;
+            var db = DBServiceLB["DBService"].GetNextServer();
             if (db == null)
             {
                 LoggingService.LogError($"not_found_db_client");
                 return ResponseType.NOT_FOUND;
             }
 
-            var response = db.Login(request);
+            var response = await db.LoginAsync(request);
             if (response == null)
             {
                 LoggingService.LogError($"authorization_response_is_null_error");
@@ -100,7 +92,7 @@ namespace Account.Service
 
         private ResponseType ReConnectedAccount(ReconnectReq request)
         {
-            var redis = serviceLB["Redis"].GetNextServer() as RedisServer.RedisServerClient;
+            var redis = RedisServiceLB["RedisService"].GetNextServer();
             if (redis == null)
             {
                 LoggingService.LogError($"not_found_redis_client");

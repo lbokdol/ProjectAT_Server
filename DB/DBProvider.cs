@@ -1,7 +1,6 @@
 ﻿using Common;
 using Common.Interface;
 using DB.Service;
-using System.Net;
 
 namespace DB
 {
@@ -15,6 +14,7 @@ namespace DB
         private Dictionary<string, List<string>> _serviceInfos;
 
         private DBService _service;
+
         public async Task RunAsync(string address, int port, Dictionary<string, List<string>> serviceInfos, CancellationToken cancellationToken)
         {
             cancellationToken.Register(() => _taskCompletionSource.TrySetCanceled());
@@ -45,8 +45,14 @@ namespace DB
             _address = address;
             _port = port;
             _serviceInfos = serviceInfos;
-
-            CreateService(address, port);
+            try
+            {
+                CreateService(address, port);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         private void CreateService(string address, int port)

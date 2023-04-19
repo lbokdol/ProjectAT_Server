@@ -5,16 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Common.Objects;
 using Grpc.Core;
-using AccountSpace;
+using SessionRpcService;
 
 namespace Session.Client
 {
-    public interface IServiceClient
-    {
-
-    }
-
-    public class AccountServiceClient: IServiceClient
+    public class AccountServiceClient
     {
         private readonly AccountServerService.AccountServerServiceClient _client;
 
