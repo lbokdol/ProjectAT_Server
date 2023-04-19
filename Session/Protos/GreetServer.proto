@@ -1,6 +1,6 @@
 ﻿syntax = "proto3";
 
-option csharp_namespace = "AccountSpace";
+option csharp_namespace = "SessionRpcService";
 
 service AccountServerService {
 	rpc Login (LoginReq) returns (LoginRes);

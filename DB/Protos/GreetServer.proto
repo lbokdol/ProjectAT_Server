@@ -1,8 +1,8 @@
 ﻿syntax = "proto3";
 
-option csharp_namespace = "DB";
+option csharp_namespace = "DBRpcService";
 
-service DBServer {
+service DBServerService {
 	rpc Login (LoginReq) returns (LoginRes);
 	rpc Register (RegisterReq) returns (RegisterRes);
 }

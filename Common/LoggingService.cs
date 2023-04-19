@@ -20,7 +20,7 @@ namespace Common
                 .CreateLogger();
         }
 
-        static public void LogInfo(string message)
+        static public void LogInformation(string message)
         {
             Logger.Information(message);
         }

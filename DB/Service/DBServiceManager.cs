@@ -3,6 +3,7 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using MySql.EntityFrameworkCore.Extensions;
 using System;
 using System.ComponentModel.DataAnnotations;
 using Common.Objects;
@@ -19,11 +20,22 @@ namespace DB.Service
 
     public class DBServiceManager
     {
-        private AccountDbContext _dbContext = new AccountDbContext(new DbContextOptions<AccountDbContext>());
+        private AccountDbContext _dbContext;// = new AccountDbContext(new DbContextOptions<AccountDbContext>());
 
         public DBServiceManager()
         {
+            Initialize();
+        }
 
+        private void Initialize()
+        {
+            // TODO: db 정보는 설정파일로 옮길 것
+            var dbInfo = "Server=localhost;Port=3307;Database=project_at;Uid=root;Pwd=1234;";
+            var optionsBuilder = new DbContextOptionsBuilder<AccountDbContext>();
+            optionsBuilder.UseMySQL(dbInfo);
+
+            _dbContext = new AccountDbContext(optionsBuilder.Options);
+            //_dbContext.Database.EnsureCreated();
         }
 
         public async Task<ResponseType> RegisterAsync(Account account)
@@ -36,7 +48,6 @@ namespace DB.Service
             _dbContext.Accounts.Add(account);
 
             var response = await _dbContext.SaveChangesAsync();
-            Console.WriteLine(response);
 
             return ResponseType.SUCCESS;
         }
@@ -81,7 +92,7 @@ namespace DB.Service
                 {
                     return ResponseType.NOT_FOUND;
                 }
-
+                Console.WriteLine("3===");
                 return ResponseType.SUCCESS;
             }
             catch (Exception e)

@@ -76,7 +76,6 @@ namespace ServerLauncher
 
             // 서비스 인스턴스 생성 및 실행
             var serviceTasks = new List<Task>();
-            
 
             foreach (var serviceName in _ServiceSettings)
             {
@@ -91,12 +90,12 @@ namespace ServerLauncher
                 var service = GetServiceByName(serviceName.Key, serviceName.Value.Port, 10000);
                 if (service != null)
                 {
-                    Console.WriteLine($"Starting {serviceName}... {serviceName.Value.IPAddress} - {serviceName.Value.Port}");
+                    LoggingService.LogInformation($"Starting {serviceName}... {serviceName.Value.IPAddress} - {serviceName.Value.Port}");
                     serviceTasks.Add(service.RunAsync(serviceName.Value.IPAddress, serviceName.Value.Port, serviceInfos, _serviceCancellationToken.Token));
                 }
                 else
                 {
-                    Console.WriteLine($"Unknown service: {serviceName}");
+                    LoggingService.LogError($"Unknown service: {serviceName}");
                 }
             }
 
@@ -194,7 +193,7 @@ namespace ServerLauncher
                 _gServer = new GrpcServer(address, port);
                 if (_gServer == null)
                 {
-                    LoggingService.LogInfo("gRPC server open fail");
+                    LoggingService.LogInformation("gRPC server open fail");
                     return false;
                 }
 
@@ -209,7 +208,7 @@ namespace ServerLauncher
             }
             finally
             {
-                LoggingService.LogInfo("Shutting down the server...");
+                LoggingService.LogInformation("Shutting down the server...");
             }
         }
     }

@@ -20,7 +20,7 @@
 
             var nextServer = _servers[_currentServerIndex];
             _currentServerIndex = (_currentServerIndex + 1) % _servers.Count;
-            return nextServer;
+            return nextServer ?? _servers.First();
         }
 
         public void AddServer(T server)

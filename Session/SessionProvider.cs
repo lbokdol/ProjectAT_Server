@@ -12,7 +12,7 @@ using Common;
 using Common.Interface;
 using Common.Network;
 using Common.Packet;
-using AccountSpace;
+using SessionRpcService;
 
 using MessagePack;
 using Grpc.Core;
@@ -31,7 +31,7 @@ namespace Session
         private readonly string _secretKey = "tlzmfltzl";
 
         private Dictionary<string, List<string>> _serviceInfos;
-        private ConcurrentDictionary<string, LoadBalancer<IServiceClient>> serviceLB = new();
+        private ConcurrentDictionary<string, LoadBalancer<AccountServiceClient>> AccountLB = new();
 
         private string _address;
         private int _port;
@@ -220,7 +220,7 @@ namespace Session
 
         private async Task<LoginRes> AuthenticateUserAsync(LoginReq request)
         {
-            var accountClient = serviceLB["AccountService"].GetNextServer() as AccountServiceClient;
+            var accountClient = AccountLB["AccountService"].GetNextServer();
             if (accountClient == null)
             {
                 // TODO: 에러코드 정리
@@ -234,7 +234,7 @@ namespace Session
 
         private async Task<RegisterRes> RegistAccountAsync(RegisterReq request)
         {
-            var accountClient = serviceLB["AccountService"].GetNextServer() as AccountServiceClient;
+            var accountClient = AccountLB["AccountService"].GetNextServer();
             if (accountClient == null)
             {
 
@@ -269,7 +269,12 @@ namespace Session
                     case "AccountService":
                         foreach (var serviceDNS in serviceInfos[serviceName])
                         {
-                            serviceLB[serviceName].AddServer(new AccountServiceClient(serviceDNS));
+                            if (AccountLB.ContainsKey(serviceName) == false)
+                            {
+                                AccountLB.TryAdd(serviceName, new LoadBalancer<AccountServiceClient>(new List<AccountServiceClient>()));
+                            }
+
+                            AccountLB[serviceName].AddServer(new AccountServiceClient(serviceDNS));
                         }
                         break;
 
