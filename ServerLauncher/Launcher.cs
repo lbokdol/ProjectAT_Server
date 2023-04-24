@@ -18,7 +18,7 @@ using Chat;
 using Inventory;
 using Player;
 using Session;
-using GameWorld;
+using GameWorldManager;
 using Monitoring;
 using DB;
 using Redis;

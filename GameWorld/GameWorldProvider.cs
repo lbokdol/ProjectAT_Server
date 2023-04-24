@@ -3,7 +3,7 @@ using Common.Interface;
 using System.Net;
 using System.Runtime.CompilerServices;
 
-namespace GameWorld
+namespace GameWorldManager
 {
     public class WorldProvider : Common.Interface.IServiceProvider
     {

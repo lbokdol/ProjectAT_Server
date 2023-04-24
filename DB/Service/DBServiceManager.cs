@@ -84,7 +84,6 @@ namespace DB.Service
 
         public async Task<ResponseType> ProcessLogin(string username, string password)
         {
-            // TODO: 에러코드 정리해야됨
             try
             {
                 var account = await _dbContext.Accounts.SingleOrDefaultAsync(a => a.Username == username && a.Password == password);
@@ -92,7 +91,7 @@ namespace DB.Service
                 {
                     return ResponseType.NOT_FOUND;
                 }
-                Console.WriteLine("3===");
+
                 return ResponseType.SUCCESS;
             }
             catch (Exception e)

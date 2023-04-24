@@ -59,7 +59,7 @@ namespace BackOffice
                 foreach(var serviceInfo in serviceInfos[service])
                 {
                     var addressPort = serviceInfo.Split(':');
-                    _channel.AddChannel<DBServer.DBServerClient>(service, addressPort[0], int.Parse(addressPort[1]));
+                    _channel.AddChannel<DBServerService.DBServerServiceClient>(service, addressPort[0], int.Parse(addressPort[1]));
                 }
             }
         }

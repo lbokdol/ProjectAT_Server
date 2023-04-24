@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameWorld.Service
+namespace GameWorld.Logic
 {
-    internal class WorldService
+    public partial class GameWorld
     {
     }
 }

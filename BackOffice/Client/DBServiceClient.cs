@@ -1,11 +1,6 @@
-﻿using AccountRpcService;
-using Common.Network;
+﻿using BackOfficeRpcService;
 using Grpc.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Common.Objects;
 
 namespace Account.Client
 {
@@ -23,5 +18,11 @@ namespace Account.Client
         {
             return await _client.LoginAsync(request);
         }
+
+        public async Task<RegisterRes> Register(RegisterReq request)
+        {
+            return await _client.RegisterAsync(request);
+        }
     }
+
 }
