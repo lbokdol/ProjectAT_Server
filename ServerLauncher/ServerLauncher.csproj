@@ -30,7 +30,7 @@
     <ProjectReference Include="..\Chat\Chat.csproj" />
     <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\DB\DB.csproj" />
-    <ProjectReference Include="..\GameWorld\GameWorld.csproj" />
+    <ProjectReference Include="..\GameWorld\GameWorldManager.csproj" />
     <ProjectReference Include="..\Inventory\Inventory.csproj" />
     <ProjectReference Include="..\Monitoring\Monitoring.csproj" />
     <ProjectReference Include="..\Player\Player.csproj" />

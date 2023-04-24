@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace GameWorldManager
 {
-    public class WorldProvider : Common.Interface.IServiceProvider
+    public class GameWorldProvider : Common.Interface.IServiceProvider
     {
         private readonly TaskCompletionSource<bool> _taskCompletionSource = new TaskCompletionSource<bool>();
 
