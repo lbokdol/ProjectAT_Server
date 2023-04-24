@@ -128,7 +128,7 @@ namespace ServerLauncher
                 case "SessionService":
                     return new SessionProvider(maxConnections);
                 case "GameWorldService":
-                    return new WorldProvider();
+                    return new GameWorldProvider();
                 case "DBService":
                     return new DBProvider();
                 case "RedisService":
