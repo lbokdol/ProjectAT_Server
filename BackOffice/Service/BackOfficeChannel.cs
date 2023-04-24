@@ -3,13 +3,15 @@ using BackOfficeRpcService;
 using System.Collections.Concurrent;
 using Common;
 using Common.Objects;
+using Account.Client;
+using System.Collections.Generic;
 
 namespace BackOffice.Service
 {
-    public class BackOfficeChannel : DBServer.DBServerClient
+    public class BackOfficeChannel : DBServerService.DBServerServiceClient
     {
         private ConcurrentDictionary<string, List<ClientBase>> _channels = new ConcurrentDictionary<string, List<ClientBase>>();
-        private ConcurrentDictionary<string, LoadBalancer<ClientBase>> serviceLB = new ConcurrentDictionary<string, LoadBalancer<ClientBase>>();
+        private ConcurrentDictionary<string, LoadBalancer<DBServiceClient>> DBServiceLB = new ConcurrentDictionary<string, LoadBalancer<DBServiceClient>>();
 
         public BackOfficeChannel()
         {
@@ -18,61 +20,34 @@ namespace BackOffice.Service
 
         public void AddChannel<T>(string serviceName, string address, int port) where T : ClientBase<T>
         {
-            var channel = new Channel($"{address}:{port}", ChannelCredentials.Insecure);
-            var client = (T)Activator.CreateInstance(typeof(T), channel);
+            if (DBServiceLB.ContainsKey(serviceName) == false)
+                DBServiceLB.TryAdd(serviceName, new LoadBalancer<DBServiceClient>(new List<DBServiceClient>()));
 
-            if (_channels.ContainsKey(serviceName) == false)
-            {
-                _channels.TryAdd(serviceName, new List<ClientBase>());
-            }
-
-            _channels[serviceName].Add(client);
-
-            if (serviceLB.ContainsKey(serviceName) == false)
-                serviceLB.TryAdd(serviceName, new LoadBalancer<ClientBase>(_channels[serviceName]));
-
-            serviceLB[serviceName].AddServer(client);
+            DBServiceLB[serviceName].AddServer(new DBServiceClient($"{address}:{port}"));
         }
-
-        public async Task<RegisterRes> Register(Account account)
+        
+        public async Task<ResponseType> RegistAccount(RegisterReq request)
         {
-            var registResponse = new RegisterRes()
-            {
-                Username = account.Username,
-            };
-
-            var request = new RegisterReq
-            {
-                Id = Guid.NewGuid().ToString(),
-                Username = account.Username,
-                Email = account.Email,
-                Password = account.Password,
-                Emailverified = account.EmailVerified,
-            };
-
-            registResponse.StatusCode = (int)GetRegistInfo(request);
-
-            return registResponse;
-        }
-
-        private ResponseType GetRegistInfo(RegisterReq request)
-        {
-            var db = serviceLB["DBService"].GetNextServer() as DBServer.DBServerClient;
+            var db = DBServiceLB["DBService"].GetNextServer();
             if (db == null)
             {
                 LoggingService.LogError($"not_found_db_client");
                 return ResponseType.NOT_FOUND;
             }
 
-            var response = db.Register(request);
+            var response = await db.Register(request);
             if (response == null)
             {
                 LoggingService.LogError($"register_response_is_null_error");
                 return ResponseType.UNKNOWN_ERROR;
             }
 
+            Console.WriteLine("aaaa");
+
             return (ResponseType)Enum.Parse(typeof(ResponseType), response.StatusCode.ToString());
+
         }
+
         /*
         private void SendEmailVerification(string email)
         {

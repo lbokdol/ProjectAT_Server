@@ -4,15 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Grpc.Net.Client;
+using GameWorldManagerRpcService;
 
-namespace GameWorld.Service
+namespace GameWorldManager.Service
 {
-    public class WorldServiceManager : IServiceManager
+    public class GameWorldServiceManager : IServiceManager
     {
         Greeter.GreeterClient _client;
 
-        public WorldServiceManager()
+        public GameWorldServiceManager()
         {
             Initialize();
         }
@@ -33,10 +33,11 @@ namespace GameWorld.Service
             Console.WriteLine(reply.Message);
         }
 
+        // TODO: 이전에 작성한 Service들과 같이 gRPC 서버를 구동시키는 코드를 작성해야 한다.
         public void ConnectChannel()
         {
-            var channel = GrpcChannel.ForAddress("https://localhost:5001");
-            _client = new Greeter.GreeterClient(channel);
+            //var channel = GrpcChannel.ForAddress("https://localhost:5001");
+            //_client = new Greeter.GreeterClient(channel);
         }
 
         public void DisconnectChannel()

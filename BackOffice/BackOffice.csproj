@@ -16,7 +16,7 @@
     </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
     <ProjectReference Include="..\Common\Common.csproj" />
-	  <Protobuf Include="Protos\GreetClient.proto" GrpcServices="Both" />
+	  <Protobuf Include="Protos\GreetClient.proto" GrpcServices="Client" />
   </ItemGroup>
 
 </Project>

@@ -63,7 +63,6 @@ namespace DB.Service
         {
             var result = await _dbServiceManager.ProcessLogin(request.Username, request.Password);
 
-            //에러코드 정리되면 메시지랑 Statuscode 넣어줘야함
             return new LoginRes
             {
                 Username = request.Username,

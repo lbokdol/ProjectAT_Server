@@ -2,7 +2,7 @@
 
 option csharp_namespace = "BackOfficeRpcService";
 
-service DBServer {
+service DBServerService {
 	rpc Login (LoginReq) returns (LoginRes);
     rpc Register (RegisterReq) returns (RegisterRes);
 }
