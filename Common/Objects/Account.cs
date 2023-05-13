@@ -27,15 +27,19 @@ namespace Common.Objects
 
         public bool EmailVerified { get; set; }
 
-        // bool 타입에서 어느부분이 틀렸을지 알려줄 목적으로 enum 타입으로 변경할 것
-        public bool Validate()
+        public ResultCode Validate()
         {
-            if (!ValidateUsername(Username) || !ValidateEmail(Email) || !ValidatePassword(Password))
-            {
-                return false;
-            }
+            if (ValidateUsername(Username) == false)
+                return ResultCode.INVALID_USERNAME;
 
-            return true;
+            if (ValidatePassword(Password) == false)
+                return ResultCode.INVALID_PASSWORD;
+
+            if (ValidateEmail(Email) == false)
+                return ResultCode.INVALID_USERNAME;
+
+
+            return ResultCode.SUCCESS;
         }
 
         public bool ValidateUsername(string username)
